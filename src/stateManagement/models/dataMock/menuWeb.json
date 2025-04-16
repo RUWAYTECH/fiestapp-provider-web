@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "code": "WEB002",
+      "name": "Inventarios",
+      "icon": "inventory",
+      "url": "",
+      "children": [
+        {
+          "code": "0000000001",
+          "name": "Lineas inventario",
+          "url": "/secure/inventory/line-inventory",
+          "icon": "assignment",
+          "actions": {
+            "create": false,
+            "update": false,
+            "delete": true,
+            "read": true,
+            "cancel": false,
+            "report": false,
+            "search": false,
+            "print": false,
+            "op1": true,
+            "op2": true,
+            "op3": true,
+            "op4": true,
+            "op5": true,
+            "op6": false,
+            "op7": false,
+            "op8": false,
+            "op9": false,
+            "op10": false
+          }
+        }
+      ]
+    }
+  ]
+}
