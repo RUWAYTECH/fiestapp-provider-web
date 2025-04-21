@@ -16,6 +16,8 @@ const paths = {
     UPDATE_USER: '/secure/user/edit/:id',
 
     INVENTORY:'/secure/inventory/line-inventory',
+
+		QUOTES:'/secure/quotes',
 }
 
 export default paths;

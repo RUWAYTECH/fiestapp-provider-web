@@ -15,6 +15,7 @@ import User from "@/pages/registerUser/User";
 import Restricted from "@/components/ui/restricted/Restricted";
 import permissions from "@/core/constants/permissionRulesConstants";
 import Inventory from "@/pages/inventory/Inventory";
+import Quotes from "@/pages/quotes/quotes";
 import Register from "@/pages/register/register";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -29,6 +30,8 @@ export const Routing = createBrowserRouter(
 			<Route path={paths.REGISTER} element={<Register />} />
       <Route path={paths.RESET} element={<ResetPassword />} />
       <Route path={paths.FORGOT} element={<ForgotPassword />} />
+
+			<Route path={paths.QUOTES} element={<Quotes />} />
 
       <Route element={<AuthGuard redirectTo={paths.LOGIN} />}>
         <Route path={paths.NOT_AUTHORIZED} element={<NotAuthorized />} />
