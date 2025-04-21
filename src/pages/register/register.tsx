@@ -2,99 +2,75 @@ import logo from "@/assets/logo.png";
 import Apartment from "@/assets/portada.jpg";
 import CustomInput from "@/components/ui/input/CustomInput";
 import useYupValidationResolver from "@/core/hooks/useYupValidationResolver";
-import GoogleIcon from '@mui/icons-material/Google';
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
-	Box,
-	Button,
-	Divider,
-	Grid,
-	IconButton,
-	InputAdornment,
-	Link,
-	TextField,
-	Typography,
+  Box,
+  Button,
+  Divider,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Link,
+  TextField,
+  Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useGoogleLogin } from '@react-oauth/google';
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { httpStatusCodes, paths } from "../../core/constants";
 import Auth from "../../core/services/auth/auth";
-import {
-	dispatchNotifyStack,
-} from "../../core/services/notistack";
-import {
-	useLazyGoogleLoginQuery,
-	useLoginMutation,
-} from "../../stateManagement/apiSlices/userApi";
-import { userDto } from "../../stateManagement/models";
+import { dispatchNotifyStack } from "../../core/services/notistack";
+import { useRegisterMutation } from "../../stateManagement/apiSlices/userApi";
 import localize from "../../utils/localizer";
-import useStyles from "./Login.styles";
-import * as userConstants from "./model/LoginConstants";
+import useStyles from "./register.styles";
+import * as userConstants from "./model/registerConstants";
+import { RegisterRequestDto } from "@/stateManagement/models/auth/register";
 
 const schema = Yup.object().shape({
-  [userConstants.USER_NAME]: Yup.string().required(
-    localize("common.fieldRequired")
-  ),
-  [userConstants.PASSWORD]: Yup.string().required(
-    localize("common.fieldRequired")
-  ),
+  [userConstants.USER_NAME]: Yup.string().required(localize("common.fieldRequired")),
+  [userConstants.EMAIL]: Yup.string()
+    .email(localize("common.invalidEmail"))
+    .required(localize("common.fieldRequired")),
+  [userConstants.PASSWORD]: Yup.string().required(localize("common.fieldRequired")),
+	[userConstants.CONFIRM_PASSWORD]: Yup.string()
+		.oneOf([Yup.ref(userConstants.PASSWORD)], localize("register.passwordsMustMatch"))
+		.required(localize("common.fieldRequired")),
 });
 
-const Login: React.FC = () => {
-	const navigate = useNavigate();
+const Register: React.FC = () => {
+  const navigate = useNavigate();
   const styles = useStyles();
   const resolver = useYupValidationResolver(schema);
-	const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [login, { isLoading }] = useLoginMutation();
-	const [googleLogin, { isLoading: loadingGoogleLogin }] = useLazyGoogleLoginQuery();
+  const [register, { isLoading }] = useRegisterMutation();
 
-  const { handleSubmit, control, formState: { errors } } = useForm<userDto>({
-		defaultValues: { identifier: '', password: '' },
+  const { handleSubmit, control, formState: { errors } } = useForm<RegisterRequestDto & { confirmPassword: string }>({
+    defaultValues: { username: '', email: '', password: '', confirmPassword: '' },
     resolver,
   });
 
-	const loginGoogle = useGoogleLogin({
-		onSuccess: (credentialResponse) => {
-			if (!credentialResponse?.access_token) return;
+  const handleSubmitForm = (data: RegisterRequestDto & { confirmPassword: string }) => {
+		const { confirmPassword, ...rest } = data;
 
-			googleLogin({ credential: credentialResponse.access_token })
-				.unwrap()
-				.then((res) => {
-					Auth.setUserToken(res.jwt);
-					Auth.setUserInfo(res.user);
-					navigate(paths.DASHBOARD);
-				})
-				.catch(() => {
-					dispatchNotifyStack({ message: localize("login.error") }, httpStatusCodes.BAD_REQUEST);
-				});
-		},
-		onError: () => {
-			dispatchNotifyStack({ message: localize("login.error") }, httpStatusCodes.BAD_REQUEST);
-		}
-	});
-
-  const handleSubmitForm = (data: userDto) => {
-    Auth.logout();
-    login(data)
+    register({ ...rest })
       .unwrap()
       .then((res) => {
         Auth.setUserToken(res.jwt);
-				Auth.setUserInfo(res.user);
-				navigate(paths.DASHBOARD);
+        Auth.setUserInfo(res.user);
+        navigate(paths.DASHBOARD);
       })
       .catch(() => {
-        dispatchNotifyStack({ message: localize("login.error") }, httpStatusCodes.BAD_REQUEST);
+        dispatchNotifyStack({ message: localize("register.error") }, httpStatusCodes.BAD_REQUEST);
       });
   };
 
   const handleShowPassword = () => setShowPassword((show) => !show);
-  const handleRegister = () => navigate(paths.REGISTER);
+  const handleLogin = () => navigate(paths.LOGIN);
 
   return (
     <Box>
@@ -128,52 +104,26 @@ const Login: React.FC = () => {
               variant="h5"
               sx={{ fontWeight: "bold", textAlign: "center" }}
             >
-							Inicia sesión en tu cuenta
+              Crea tu cuenta
             </Typography>
             <Box sx={{ width: "100%", maxWidth: "400px" }}>
-							<Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-								<Button
-									variant="outlined"
-									fullWidth
-									size="large"
-									startIcon={
-										loadingGoogleLogin ? (
-											<CircularProgress size={20} color="inherit" />
-										) : <GoogleIcon />
-									}
-									disabled={loadingGoogleLogin}
-									onClick={() => loginGoogle()}
-									sx={{
-										borderRadius: 2,
-										py: 1,
-										textTransform: "none",
-										borderColor: "#dadce0",
-										color: "rgba(0, 0, 0, 0.87)",
-										backgroundColor: "#fff",
-										"&:hover": {
-											backgroundColor: "#f8f9fa",
-											borderColor: "#dadce0",
-											boxShadow: "0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)",
-										},
-										justifyContent: "center",
-									}}
-								>
-									Continuar con Google
-								</Button>
-							</Box>
-							<Box sx={{ textAlign: "center", mt: 2 }}>
-								<Typography variant="body2" sx={{ color: "text.secondary" }}>
-									- o -
-								</Typography>
-							</Box>
               <form onSubmit={handleSubmit(handleSubmitForm)}>
                 <CustomInput
                   id={userConstants.USER_NAME}
                   control={control}
-                  label={localize("login.userName")}
-                  placeholder={localize("login.userPlaceholder")}
+                  label={localize("register.userName")}
+                  placeholder={localize("register.userNamePlaceholder")}
                   errorText={errors[userConstants.USER_NAME]?.message}
                   error={!!errors[userConstants.USER_NAME]}
+                />
+
+                <CustomInput
+                  id={userConstants.EMAIL}
+                  control={control}
+                  label={localize("register.email")}
+                  placeholder={localize("register.emailPlaceholder")}
+                  errorText={errors[userConstants.EMAIL]?.message}
+                  error={!!errors[userConstants.EMAIL]}
                 />
 
                 <Controller
@@ -190,9 +140,9 @@ const Login: React.FC = () => {
                       {...field}
                       type={showPassword ? "text" : "password"}
                       id={userConstants.PASSWORD}
-                      label={localize("login.password")}
+                      label={localize("register.password")}
                       variant="outlined"
-                      placeholder={localize("login.passPlaceholder")}
+                      placeholder={localize("register.passwordPlaceholder")}
                       error={!!errors[userConstants.PASSWORD]}
                       helperText={errors[userConstants.PASSWORD]?.message}
                       margin="normal"
@@ -213,6 +163,44 @@ const Login: React.FC = () => {
                     />
                   )}
                 />
+								{/* confirm password */}
+								<Controller
+									control={control}
+									name={userConstants.CONFIRM_PASSWORD}
+									rules={{
+										required: {
+											value: true,
+											message: localize("common.fieldRequired"),
+										},
+									}}
+									render={({ field }) => (
+										<TextField
+											{...field}
+											type={showConfirmPassword ? "text" : "password"}
+											id={userConstants.CONFIRM_PASSWORD}
+											label={localize("register.confirmPassword")}
+											variant="outlined"
+											placeholder={localize("register.confirmPasswordPlaceholder")}
+											error={!!errors[userConstants.CONFIRM_PASSWORD]}
+											helperText={errors[userConstants.CONFIRM_PASSWORD]?.message}
+											margin="normal"
+											fullWidth
+											InputProps={{
+												endAdornment: (
+													<InputAdornment position="end">
+														<IconButton onClick={() => setShowConfirmPassword((show) => !show)} edge="end">
+															{showConfirmPassword ? (
+																<VisibilityIcon />
+															) : (
+																<VisibilityOffIcon />
+															)}
+														</IconButton>
+													</InputAdornment>
+												),
+											}}
+										/>
+									)}
+								/>
                 <Button
                   type="submit"
                   variant="contained"
@@ -226,7 +214,7 @@ const Login: React.FC = () => {
                   disabled={isLoading}
                   sx={{ mt: 1, textTransform: "uppercase" }}
                 >
-                  Iniciar sesión
+                  Registrarse
                 </Button>
               </form>
               <br />
@@ -234,13 +222,13 @@ const Login: React.FC = () => {
               <Grid container justifyContent="center" gap={2} marginTop={2}>
                 <Grid item>
                   <Typography variant="subtitle1">
-                    {"¿No tienes una cuenta?"}
+                    {"¿Ya tienes una cuenta?"}
                   </Typography>
                 </Grid>
                 <Grid item>
                   <Typography variant="subtitle1" gutterBottom>
                     <Link
-                      onClick={handleRegister}
+                      onClick={handleLogin}
                       color="inherit"
                       underline="none"
                       fontWeight="bold"
@@ -253,31 +241,11 @@ const Login: React.FC = () => {
                         },
                       }}
                     >
-                      Registrarse
+                      Inicia sesión
                     </Link>
                   </Typography>
                 </Grid>
               </Grid>
-              {/* <Grid container justifyContent="center">
-                <Typography variant="subtitle2" gutterBottom>
-                  <Link
-                    onClick={handleForgotPassword}
-                    color="inherit"
-                    underline="none"
-                    fontWeight="bold"
-                    sx={{
-                      textDecoration: "none",
-                      cursor: "pointer",
-                      "&:hover": {
-                        color: "secondary",
-                        textDecoration: "underline",
-                      },
-                    }}
-                  >
-                    ¿Has olvidado tu contraseña?
-                  </Link>
-                </Typography>
-              </Grid> */}
             </Box>
           </Box>
         </Grid>
@@ -285,4 +253,5 @@ const Login: React.FC = () => {
     </Box>
   );
 };
-export default Login;
+
+export default Register;

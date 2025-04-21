@@ -4,7 +4,9 @@ export const endpoints = {
     },
     user: {
         //login: '/auth/local',
-        login: '/accounts/login',
+        login: '/auth/local',
+				googleLogin: '/auth/google/callback?access_token=:token',
+				register: '/auth/local/register',
         forgotPassword: '/auth/forgot-password',
         resetPassword: '/auth/reset-password',
         allSelectUser: '/users',

@@ -14,12 +14,16 @@ import {
   updateUserMutation,
   deleteUserMutation,
   allUserRolQuery,
+	googleLoginQuery,
+	registerMutation,
 } from "../queries/userQueries";
 import { getAccountMenuQuery } from "../queries/accountQueries";
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     login: build.mutation(loginMutation),
+		googleLogin: build.query(googleLoginQuery),
+		register: build.mutation(registerMutation),
     forgotPassword: build.mutation(forgotPasswordMutation),
     resetPassword: build.mutation(resetPasswordMutation),
     allSelectUser: build.query(allSelectUserQuery),
@@ -38,6 +42,8 @@ export const userApi = apiSlice.injectEndpoints({
 
 export const {
   useLoginMutation,
+	useLazyGoogleLoginQuery,
+	useRegisterMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useAllSelectUserQuery,

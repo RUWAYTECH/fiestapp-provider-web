@@ -13,6 +13,8 @@ import store from "./stateManagement/store";
 import { IntlProvider } from "react-intl";
 import { languageWithoutRegionCode, messages } from "./utils/localizer";
 import NotistackProvider from "./components/containers/notiStack/NotistackProvider";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import Config from "./core/config/config";
 // import { Suspense } from 'react';
 // import LoadingLazy from '@/pages/LoadingLazy';
 
@@ -30,25 +32,27 @@ function App() {
         messages={messages}
       >
         <ThemeProvider theme={theme}>
-          <NotistackProvider>         
-            <CssBaseline />
-            <div
-              style={{
-                position: "fixed",
-                top: 0,
-                right: 0,
-                zIndex: 1299,
-                backgroundColor: theme.palette.background.default,
-                borderRadius: "0 0 0 10px",
-                padding: "3px",
-              }}
-            >
-              <IconButton onClick={toggleColorMode} color="inherit">
-                {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-              </IconButton>
-            </div>           
-            <RouterProvider router={Routing} />
-          </NotistackProvider>
+          <NotistackProvider>
+						<GoogleOAuthProvider clientId={Config.googleClientId}>
+							<CssBaseline />
+							<div
+								style={{
+									position: "fixed",
+									top: 0,
+									right: 0,
+									zIndex: 1299,
+									backgroundColor: theme.palette.background.default,
+									borderRadius: "0 0 0 10px",
+									padding: "3px",
+								}}
+							>
+								<IconButton onClick={toggleColorMode} color="inherit">
+									{mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+								</IconButton>
+							</div>
+							<RouterProvider router={Routing} />
+						</GoogleOAuthProvider>
+					</NotistackProvider>
         </ThemeProvider>
       </IntlProvider>
     </Provider>

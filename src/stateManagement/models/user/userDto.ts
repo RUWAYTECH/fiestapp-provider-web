@@ -1,3 +1,9 @@
+export interface User {
+	id: number
+	username: string
+	email: string
+}
+
 export interface userDto {
     identifier: string;
     password: string;

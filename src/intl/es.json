@@ -44,8 +44,8 @@
   "common.codeName": "Ocurrio un error, el codigo y el nombre ya existe",
   "common.userExist": "Ya existe un usuario con datos similares",
   "common.noAuthorized": "No tiene permisos para ejecutar esta acción",
-  "common.downloadFileZip": "Generar archivo .zip de los comprobantes seleccionados",  
-  "common.success": "Se procesó de manera correacta",  
+  "common.downloadFileZip": "Generar archivo .zip de los comprobantes seleccionados",
+  "common.success": "Se procesó de manera correacta",
   "common.all": "Todos",
   "common.checkAll": "Marcar todos",
   "common.saveChanges": "Guardar cambios",
@@ -54,6 +54,8 @@
   "common.excel": "EXCEL",
   "common.options": "Opciones",
   "common.rowsPerPage": "Filas por página:",
+	"common.fieldRequired": "Campo requerido",
+	"common.invalidEmail": "Correo inválido",
   "requiredEmail": "Ingrese un correo válido",
   "requiredInput": "Campo obligatorio",
   "modal.confirmTitle":"Desea eliminar",
@@ -73,6 +75,20 @@
   "login.password": "Contraseña",
   "login.userPlaceholder": "Escribe tu usuario",
   "login.passPlaceholder": "Digita tu contraseña",
+
+	"register.title": "Registro de usuario",
+	"register.userName": "Nombre de usuario",
+	"register.email": "Correo electrónico",
+	"register.password": "Contraseña",
+	"register.confirmPassword": "Confirmar contraseña",
+	"register.terms": "Acepto los términos y condiciones",
+	"register.userNamePlaceholder": "Escribe tu nombre de usuario",
+	"register.emailPlaceholder": "Escribe tu correo electrónico",
+	"register.passwordPlaceholder": "Escribe tu contraseña",
+	"register.confirmPasswordPlaceholder": "Confirma tu contraseña",
+	"register.passwordsMustMatch": "Las contraseñas deben coincidir",
+	"register.error": "Ocurrió un error al registrar el usuario",
+	"register.success": "Usuario registrado con éxito",
 
   "user.id":"Código",
   "user.fullName":"Nombres y apellidos",
@@ -102,7 +118,7 @@
   "user.resgisterResident": "Se completo de manera correcta la creación del residente",
 
 
-  
+
 
   "":""
 }

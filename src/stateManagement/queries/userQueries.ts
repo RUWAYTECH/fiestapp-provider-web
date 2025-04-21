@@ -1,15 +1,40 @@
 import { endpoints as ep } from "../../core/constants";
 import { TagDescription } from "@reduxjs/toolkit/dist/query";
+import { ApiResponseDto } from "../models/api-response-dto";
+import { LoginResponseDto, LoginWithEmailDto, LoginWithGoogleDto } from "../models/auth/login";
+import { RegisterRequestDto } from "../models/auth/register";
 
 export const loginMutation = {
-  query: (data: any) => {
+  query: (data: LoginWithEmailDto) => {
     return {
       url: ep.user.login,
       data,
       method: "POST",
     };
   },
-  transformResponse: (response: any) => response,
+  transformResponse: (response: ApiResponseDto<LoginResponseDto>) => response,
+};
+
+export const googleLoginQuery = {
+	query: (data: LoginWithGoogleDto) => {
+		return {
+			url: ep.user.googleLogin.replace(":token", data.credential),
+			data,
+			method: "GET",
+		};
+	},
+	transformResponse: (response: ApiResponseDto<LoginResponseDto>) => response,
+};
+
+export const registerMutation = {
+	query: (data: RegisterRequestDto) => {
+		return {
+			url: ep.user.register,
+			data,
+			method: "POST",
+		};
+	},
+	transformResponse: (response: ApiResponseDto<LoginResponseDto>) => response
 };
 
 export const forgotPasswordMutation = {
