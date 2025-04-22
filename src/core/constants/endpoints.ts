@@ -18,5 +18,16 @@ export const endpoints = {
         updateUser: '/users/:id',
         deleteUser: '/users/:id',
         getUserRol: '/users-permissions/roles'
-    }
+    },
+		profile: {
+				getProfile: '/users/me?populate=*',
+				updateProfile: '/users/:id',
+				changePassword: '/auth/change-password',
+				updateAvatar: '/upload',
+		},
+		provider: {
+			getProviderByUserId: '/providers?filters[user][id][$eq]=:userId',
+			updateProvider: '/providers/:id',
+			createProvider: '/providers',
+		}
 }

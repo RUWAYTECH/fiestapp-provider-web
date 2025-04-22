@@ -6,9 +6,10 @@ const apiSlice = createApi({
     baseQuery: rtkAxiosBaseQuery(),
     tagTypes: [
         'User',
+				'Provider',
     ],
     endpoints: () => ({
-      
+
     }),
 })
 

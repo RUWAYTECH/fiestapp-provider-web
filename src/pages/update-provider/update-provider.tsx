@@ -5,6 +5,12 @@ import { updateProviderConstants } from "./model/constants"
 import localize from "@/utils/localizer"
 import useYupValidationResolver from "@/core/hooks/useYupValidationResolver"
 import * as Yup from "yup"
+import { useCreateProviderMutation, useLazyGetProviderByUserIdQuery, useUpdateProviderMutation } from "@/stateManagement/apiSlices/providerApi"
+import Auth from "@/core/services/auth/auth"
+import { useEffect, useState } from "react"
+import { ProviderRequestDto } from "@/stateManagement/models/provider/provider-dto"
+import { CircularProgress } from "@mui/material"
+import { dispatchNotifyStackError, dispatchNotifyStackSuccess } from "@/core/services/notistack"
 
 const schema = Yup.object().shape({
 	[updateProviderConstants.NAME]: Yup.string().required(localize("common.fieldRequired")),
@@ -21,8 +27,13 @@ const schema = Yup.object().shape({
 
 const UpdateProvider = () => {
 	const resolver = useYupValidationResolver(schema);
+	const userInfo = Auth.getUserInfo()
+	const [ providerId, setProviderId ] = useState<number | null>(null)
+	const [ getProviderById, { isLoading: isLoadingGetProviderById } ] = useLazyGetProviderByUserIdQuery()
+	const [ updateProvider, { isLoading: isLoadingUpdateProvider } ] = useUpdateProviderMutation()
+	const [ createProvider, { isLoading: isLoadingCreateProvider } ] = useCreateProviderMutation()
 
-	const { handleSubmit, control, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
+	const { handleSubmit, control, setValue, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
 		defaultValues: {
 			name: "",
 			description: "",
@@ -34,12 +45,63 @@ const UpdateProvider = () => {
 			instagram: "",
 		},
 		resolver,
+		disabled: isLoadingGetProviderById,
 	})
 
 	const handleSubmitForm = (data: Yup.InferType<typeof schema>) => {
-		console.log("Form submitted", data)
-		// Aquí puedes manejar el envío del formulario, como hacer una llamada a la API
+		if (!userInfo.id) return
+
+		const newData: ProviderRequestDto = {
+			name: data.name ?? '',
+			description: data.description ?? '',
+			email: data.email ?? '',
+			phone: data.phone ?? '',
+			address: data.address ?? '',
+			website: data.website,
+			facebookUrl: data.facebook,
+			instagramUrl: data.instagram,
+		}
+
+		if (providerId) {
+			updateProvider({ id: providerId.toString(), data: newData }).unwrap().then((response) => {
+				if (response.data) {
+					dispatchNotifyStackSuccess("Datos actualizados correctamente")
+				}
+			}).catch(() => {
+				dispatchNotifyStackError('Error al actualizar datos')
+			})
+		} else {
+			createProvider(newData).unwrap().then((response) => {
+				if (response.data) {
+					dispatchNotifyStackSuccess("Datos actualizados correctamente")
+				}
+			}).catch(() => {
+				dispatchNotifyStackError('Error al actualizar datos')
+			})
+		}
 	}
+
+	useEffect(() => {
+		setProviderId(null)
+
+		if (userInfo.id) {
+			getProviderById(userInfo.id).unwrap().then((response) => {
+				const provider = response.data[0]
+				if (provider) {
+					setProviderId(provider.id)
+					// set default values for the form
+					setValue(updateProviderConstants.NAME, provider.name)
+					setValue(updateProviderConstants.DESCRIPTION, provider.description ?? "")
+					setValue(updateProviderConstants.EMAIL, provider.email)
+					setValue(updateProviderConstants.PHONE, provider.phone ?? "")
+					setValue(updateProviderConstants.ADDRESS, provider.address)
+					setValue(updateProviderConstants.WEBSITE, provider.website ?? "")
+					setValue(updateProviderConstants.FACEBOOK, provider.facebookUrl ?? "")
+					setValue(updateProviderConstants.INSTAGRAM, provider.instagramUrl ?? "")
+				}
+			})
+		}
+	}, [userInfo?.id])
 
 	return (
 		<Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -146,6 +208,8 @@ const UpdateProvider = () => {
 							variant="contained"
 							color="primary"
 							size="large"
+							disabled={isLoadingUpdateProvider || isLoadingCreateProvider}
+							startIcon={isLoadingUpdateProvider || isLoadingCreateProvider ? <CircularProgress size={20} /> : null}
 						>
 							{localize("updateProvider.submit")}
 						</Button>
