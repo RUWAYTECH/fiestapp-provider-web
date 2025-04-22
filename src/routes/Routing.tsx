@@ -12,11 +12,14 @@ import Login from "@/pages/login/Login";
 import ForgotPassword from "@/pages/forgotPassword/ForgotPassword";
 import ResetPassword from "@/pages/resetPassword/ResetPassword";
 import User from "@/pages/registerUser/User";
-import Restricted from "@/components/ui/restricted/Restricted";
+/* import Restricted from "@/components/ui/restricted/Restricted";
 import permissions from "@/core/constants/permissionRulesConstants";
-import Inventory from "@/pages/inventory/Inventory";
+import Inventory from "@/pages/inventory/Inventory"; */
 import Quotes from "@/pages/quotes/quotes";
 import Register from "@/pages/register/register";
+import RegisterProvider from "@/pages/update-provider/update-provider";
+import Profile from "@/pages/profile/profile";
+import Services from "@/pages/services/services";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const NotAuthorized = lazy(() => import("@/pages/NotAuthorized"));
@@ -31,14 +34,17 @@ export const Routing = createBrowserRouter(
       <Route path={paths.RESET} element={<ResetPassword />} />
       <Route path={paths.FORGOT} element={<ForgotPassword />} />
 
-			<Route path={paths.QUOTES} element={<Quotes />} />
 
-      <Route element={<AuthGuard redirectTo={paths.LOGIN} />}>
+      	<Route element={<AuthGuard redirectTo={paths.LOGIN} />}>
         <Route path={paths.NOT_AUTHORIZED} element={<NotAuthorized />} />
 
+				<Route path={paths.UPDATE_PROVIDER} element={<RegisterProvider />} />
+				<Route path={paths.QUOTES} element={<Quotes />} />
         <Route path={paths.DASHBOARD} element={<Dashboard />} />
         <Route path={paths.USER} element={<User />} />
-        <Route
+				<Route path={paths.PROFILE} element={<Profile />} />
+				<Route path={paths.SERVICES} element={<Services />} />
+        {/* <Route
           path={paths.INVENTORY}
           element={
             <Restricted
@@ -48,7 +54,7 @@ export const Routing = createBrowserRouter(
               <Inventory />
             </Restricted>
           }
-        />
+        /> */}
       </Route>
     </>
   )

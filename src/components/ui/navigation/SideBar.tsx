@@ -13,6 +13,10 @@ import Zoom from "@mui/material/Zoom";
 import Box from "@mui/material/Box";
 import MiIcono from "@/assets/logoProject.png";
 import HomeIcon from "@mui/icons-material/Home";
+import UpdateProviderIcon from "@mui/icons-material/ManageAccounts";
+import QuotesIcon from "@mui/icons-material/AttachMoney";
+import ServiceIcon from "@mui/icons-material/Build";
+import ProfileIcon from "@mui/icons-material/AccountCircle";
 import { paths } from "@/core/constants";
 import { Link, useLocation } from "react-router-dom";
 import Auth from "@/core/services/auth/auth";
@@ -80,6 +84,26 @@ const pagesList = [
     name: "Dashboard",
     icon: <HomeIcon />,
   },
+	{
+		link: paths.UPDATE_PROVIDER,
+		name: "Actualizar datos",
+		icon: <UpdateProviderIcon />,
+	},
+	{
+		link: paths.SERVICES,
+		name: "Mis Servicios",
+		icon: <ServiceIcon />,
+	},
+	{
+		link: paths.QUOTES,
+		name: "Cotizaciones",
+		icon: <QuotesIcon />,
+	},
+	{
+		link: paths.PROFILE,
+		name: "Perfil",
+		icon: <ProfileIcon />,
+	}
 ];
 
 

@@ -54,8 +54,10 @@
   "common.excel": "EXCEL",
   "common.options": "Opciones",
   "common.rowsPerPage": "Filas por página:",
-	"common.fieldRequired": "Campo requerido",
+	"common.fieldRequired": "Campo obligatorio",
 	"common.invalidEmail": "Correo inválido",
+	"common.invalidUrl": "URL inválida",
+	"common.passwordsMustMatch": "Las contraseñas no coinciden",
   "requiredEmail": "Ingrese un correo válido",
   "requiredInput": "Campo obligatorio",
   "modal.confirmTitle":"Desea eliminar",
@@ -117,8 +119,29 @@
   "user.mensageEmails": "Introduce una dirección de correo electrónico válida",
   "user.resgisterResident": "Se completo de manera correcta la creación del residente",
 
+	"profile.currentPassword": "Contraseña actual",
+	"profile.newPassword": "Nueva contraseña",
+	"profile.confirmNewPassword": "Confirmar nueva contraseña",
+	"profile.changePassword": "Cambiar contraseña",
+	"profile.businessName": "Nombre de la empresa",
+	"profile.email": "Correo electrónico",
+	"profile.phone": "Teléfono",
+	"profile.address": "Dirección",
+	"profile.website": "Sitio web",
+	"profile.facebook": "Facebook",
+	"profile.instagram": "Instagram",
+	"profile.updateProfile": "Actualizar perfil",
 
-
-
+	"updateProvider.title": "Actualizar datos de la empresa",
+	"updateProvider.businessName": "Nombre de la empresa",
+	"updateProvider.category": "Tipo de servicio",
+	"updateProvider.email": "Correo electrónico",
+	"updateProvider.phone": "Teléfono",
+	"updateProvider.address": "Dirección",
+	"updateProvider.description": "Descripción",
+	"updateProvider.website": "Sitio web",
+	"updateProvider.facebook": "Facebook",
+	"updateProvider.instagram": "Instagram",
+	"updateProvider.submit": "Actualizar",
   "":""
 }

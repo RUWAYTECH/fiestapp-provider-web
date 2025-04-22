@@ -11,11 +11,12 @@ const paths = {
     FORGOT: '/forgot',
 
     PROFILE: '/secure/profile',
+		UPDATE_PROVIDER: '/secure/update-provider',
     USER:'/secure/user',
     CREATE_USER: '/secure/user/create',
     UPDATE_USER: '/secure/user/edit/:id',
 
-    INVENTORY:'/secure/inventory/line-inventory',
+    SERVICES:'/secure/services',
 
 		QUOTES:'/secure/quotes',
 }

@@ -22,3 +22,9 @@ export interface resetPasswordDto {
     passwordConfirmation: string;
     code: string;
 }
+
+export interface changePasswordDto {
+	currentPassword: string;
+	password: string;
+	passwordConfirmation: string;
+}
