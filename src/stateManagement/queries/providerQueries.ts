@@ -47,3 +47,16 @@ export const updateProviderMutation = {
 	transformResponse: (response: ApiResponseDto<{ data: ProviderResponseDto  }>) => response,
 	invalidatesTags: [{ type: "Provider" as "Provider", id: "PROVIDER_LIST" }],
 };
+
+export const updateProviderProfileMutation = {
+	query: (data: ProviderRequestDto) => {
+		const path = ep.provider.updateProviderProfile;
+		return {
+			url: path,
+			data: { data },
+			method: "POST",
+		};
+	},
+	transformResponse: (response: ApiResponseDto<{ data: ProviderResponseDto }>) => response,
+	invalidatesTags: [{ type: "Provider" as "Provider", id: "PROVIDER_LIST" }],
+};

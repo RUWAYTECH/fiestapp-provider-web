@@ -29,5 +29,6 @@ export const endpoints = {
 			getProviderByUserId: '/providers?filters[user][id][$eq]=:userId',
 			updateProvider: '/providers/:id',
 			createProvider: '/providers',
+			updateProviderProfile: '/providers/custom-create-or-update',
 		}
 }

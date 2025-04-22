@@ -5,9 +5,9 @@ import { updateProviderConstants } from "./model/constants"
 import localize from "@/utils/localizer"
 import useYupValidationResolver from "@/core/hooks/useYupValidationResolver"
 import * as Yup from "yup"
-import { useCreateProviderMutation, useLazyGetProviderByUserIdQuery, useUpdateProviderMutation } from "@/stateManagement/apiSlices/providerApi"
+import { useLazyGetProviderByUserIdQuery, useUpdateProviderProfileMutation } from "@/stateManagement/apiSlices/providerApi"
 import Auth from "@/core/services/auth/auth"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { ProviderRequestDto } from "@/stateManagement/models/provider/provider-dto"
 import { CircularProgress } from "@mui/material"
 import { dispatchNotifyStackError, dispatchNotifyStackSuccess } from "@/core/services/notistack"
@@ -28,10 +28,8 @@ const schema = Yup.object().shape({
 const UpdateProvider = () => {
 	const resolver = useYupValidationResolver(schema);
 	const userInfo = Auth.getUserInfo()
-	const [ providerId, setProviderId ] = useState<number | null>(null)
 	const [ getProviderById, { isLoading: isLoadingGetProviderById } ] = useLazyGetProviderByUserIdQuery()
-	const [ updateProvider, { isLoading: isLoadingUpdateProvider } ] = useUpdateProviderMutation()
-	const [ createProvider, { isLoading: isLoadingCreateProvider } ] = useCreateProviderMutation()
+	const [ updateProviderProfile, { isLoading: isLoadingUpdate } ] = useUpdateProviderProfileMutation()
 
 	const { handleSubmit, control, setValue, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
 		defaultValues: {
@@ -62,34 +60,20 @@ const UpdateProvider = () => {
 			instagramUrl: data.instagram,
 		}
 
-		if (providerId) {
-			updateProvider({ id: providerId.toString(), data: newData }).unwrap().then((response) => {
-				if (response.data) {
-					dispatchNotifyStackSuccess("Datos actualizados correctamente")
-				}
-			}).catch(() => {
-				dispatchNotifyStackError('Error al actualizar datos')
-			})
-		} else {
-			createProvider(newData).unwrap().then((response) => {
-				if (response.data) {
-					dispatchNotifyStackSuccess("Datos actualizados correctamente")
-				}
-			}).catch(() => {
-				dispatchNotifyStackError('Error al actualizar datos')
-			})
-		}
+		updateProviderProfile(newData).unwrap().then((response) => {
+			if (response.data) {
+				dispatchNotifyStackSuccess('Datos actualizados correctamente')
+			}
+		}).catch(() => {
+			dispatchNotifyStackError('Error al actualizar datos')
+		})
 	}
 
 	useEffect(() => {
-		setProviderId(null)
-
 		if (userInfo.id) {
 			getProviderById(userInfo.id).unwrap().then((response) => {
 				const provider = response.data[0]
 				if (provider) {
-					setProviderId(provider.id)
-					// set default values for the form
 					setValue(updateProviderConstants.NAME, provider.name)
 					setValue(updateProviderConstants.DESCRIPTION, provider.description ?? "")
 					setValue(updateProviderConstants.EMAIL, provider.email)
@@ -208,8 +192,8 @@ const UpdateProvider = () => {
 							variant="contained"
 							color="primary"
 							size="large"
-							disabled={isLoadingUpdateProvider || isLoadingCreateProvider}
-							startIcon={isLoadingUpdateProvider || isLoadingCreateProvider ? <CircularProgress size={20} /> : null}
+							disabled={isLoadingUpdate}
+							startIcon={isLoadingUpdate ? <CircularProgress size={20} /> : null}
 						>
 							{localize("updateProvider.submit")}
 						</Button>
