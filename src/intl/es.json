@@ -3,6 +3,7 @@
   "common.create": "Guardar",
   "common.update": "Actualizar",
   "common.add": "Agregar",
+	"common.save": "Guardar",
   "common.cancel": "Cancelar",
   "common.ok": "Ok",
   "common.yes": "Si",
@@ -66,6 +67,7 @@
   "modal.okText":"Si",
   "upload": "Subir Archivo",
   "uploadTitle": "Selecciona un archivo Excel",
+	"responseMessage.errorsClient": "Ocurrió un error al procesar la solicitud",
 
   "login.singIn": "Iniciar Sesión",
   "login.welcome": "¡Hola! Bienvenido 🚀 ",
@@ -143,5 +145,14 @@
 	"updateProvider.facebook": "Facebook",
 	"updateProvider.instagram": "Instagram",
 	"updateProvider.submit": "Actualizar",
+
+	"service.title": "Mis servicios",
+	"service.name": "Nombre del servicio",
+	"service.description": "Descripción",
+	"service.minPrice": "Precio mínimo",
+	"service.maxPrice": "Precio máximo",
+	"service.serviceZone": "Zonas de servicio",
+	"service.images": "Fotos del servicio",
+	"service.category": "Categoría",
   "":""
 }

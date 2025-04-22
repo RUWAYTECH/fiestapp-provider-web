@@ -1,3 +1,4 @@
+import { Paper, useTheme } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 
@@ -35,6 +36,8 @@ const img = {
 
 const UploadImage = () => {
 	const [files, setFiles] = useState<any[]>([])
+	const theme = useTheme()
+
 	const { getRootProps, getInputProps } = useDropzone({
 		accept: {
 			'image/*': []
@@ -65,12 +68,12 @@ const UploadImage = () => {
 	}, [files])
 
 	return (
-		<section className="container">
-			<div {...getRootProps({ className: 'dropzone' })}>
+		<section style={{ marginTop: '20px' }}>
+			<Paper {...getRootProps({ className: 'dropzone' })} sx={{ backgroundColor: theme.palette.background.paper, padding: 2, borderRadius: 2, border: '1px dashed', borderColor: theme.palette.primary.main, cursor: 'pointer', '&:hover': { backgroundColor: theme.palette.background.default } }}>
 				<input {...getInputProps()} />
 				{/* <p>Drag 'n' drop some files here, or click to select files</p> */}
 				<p>Arrastra y suelta algunas imágenes aquí, o haz clic para seleccionar imágenes</p>
-			</div>
+			</Paper>
 			<aside style={thumbsContainer}>
 				{thumbs}
 			</aside>

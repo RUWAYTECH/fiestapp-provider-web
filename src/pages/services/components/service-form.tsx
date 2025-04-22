@@ -7,6 +7,9 @@ import { Box, Button, Grid } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 import UploadImage from './upload-images'
+import { useGetCategoriesQuery } from '@/stateManagement/apiSlices/categoryApi'
+import { useGetUbigeosQuery } from '@/stateManagement/apiSlices/ubigeoApi'
+import { ServiceRequestDto } from '@/stateManagement/models/service/service-dto'
 
 const schema = Yup.object().shape({
 	name: Yup.string().required(localize("common.fieldRequired")),
@@ -14,16 +17,20 @@ const schema = Yup.object().shape({
 	description: Yup.string().required(localize("common.fieldRequired")),
 	minPrice: Yup.number().required(localize("common.fieldRequired")),
 	maxPrice: Yup.number().required(localize("common.fieldRequired")),
-	serviceZone: Yup.string().required(localize("common.fieldRequired")),
-	attachments: Yup.array().of(Yup.mixed()).required(localize("common.fieldRequired")),
+	serviceZone: Yup.array().of(Yup.object().shape({
+		value: Yup.number().required(localize("common.fieldRequired")),
+		label: Yup.string().required(localize("common.fieldRequired")),
+	})).required(localize("common.fieldRequired")),
+	attachments: Yup.array().of(Yup.string().required(localize("common.fieldRequired"))).required(localize("common.fieldRequired")),
 })
 
 interface ServiceFormProps {
 	onCancel: () => void
-	onSave: (data: Yup.InferType<typeof schema>) => void
+	onSave: (data: ServiceRequestDto) => void
+	isLoading?: boolean
 }
 
-const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
+const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }) => {
 	const resolver = useYupValidationResolver(schema)
 
 	const { handleSubmit, control, setValue, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
@@ -33,11 +40,27 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
 			description: "",
 			minPrice: 0,
 			maxPrice: 0,
-			serviceZone: "",
+			serviceZone: [],
 			attachments: [],
 		},
 		resolver,
 	})
+
+	const { data: categories, isLoading: loadingCategories } = useGetCategoriesQuery(undefined)
+	const { data: ubigeos, isLoading: loadingUbigeos } = useGetUbigeosQuery(undefined)
+
+	const handleFormSubmit = (data: Yup.InferType<typeof schema>) => {
+		onSave({
+			name: data.name,
+			description: data.description,
+			priceMin: data.minPrice,
+			priceMax: data.maxPrice,
+			category: data.category,
+			localizations: data.serviceZone.map((item) => item.value),
+			fileImage: data.attachments,
+			score: 5
+		})
+	}
 
 	return (
 		<div style={{ width: "100%" }}>
@@ -45,7 +68,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
 				<CustomInput
 					id="name"
 					control={control}
-					label={localize("services.name")}
+					label={localize("service.name")}
 					error={!!errors.name}
 					errorText={errors.name?.message}
 				/>
@@ -63,14 +86,14 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
 							<SelectTextField
 								{...field}
 								fullWidth
-								loading={false}
+								loading={loadingCategories}
 								size="small"
-								label={localize("registerProvider.category")}
+								label={localize("service.category")}
 								name="category"
 								id="category"
-								options={[]}
+								options={categories?.map(item => ({ label: item.name, value: item.id })) || []}
 								onSelectItem={(_e: any, option: any) => {
-									setValue("category", option.code);
+									setValue("category", option.id);
 								}}
 								error={!!errors.category}
 							/>
@@ -80,7 +103,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
 				<CustomInput
 					id="description"
 					control={control}
-					label={localize("services.description")}
+					label={localize("service.description")}
 					error={!!errors.description}
 					errorText={errors.description?.message}
 				/>
@@ -89,7 +112,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
 						<CustomInput
 							id="minPrice"
 							control={control}
-							label={localize("services.minPrice")}
+							label={localize("service.minPrice")}
 							type="number"
 							error={!!errors.minPrice}
 							errorText={errors.minPrice?.message}
@@ -99,47 +122,51 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
 						<CustomInput
 							id="maxPrice"
 							control={control}
-							label={localize("services.maxPrice")}
+							label={localize("service.maxPrice")}
 							type="number"
 							error={!!errors.maxPrice}
 							errorText={errors.maxPrice?.message}
 						/>
 					</Grid>
 				</Grid>
-				<Controller
-					control={control}
-					name="serviceZone"
-					rules={{
-						required: {
-							value: true,
-							message: localize("requiredInput"),
-						},
-					}}
-					render={({ field }) => (
-						<AutoCompleteCheckBox
-							{...field}
-							id="serviceZone"
-							name="serviceZone"
-							size="small"
-							noneOption
-							noneOptionLabel="Todos"
-							noneOptionValue="all"
-							label={localize("services.serviceZone")}
-							placeholder={"Seleccione"}
-							dataOptions={[]}
-							onSelectItem={(items: any) => {
-								setValue("serviceZone", items);
-							}}
-							error={!!errors.serviceZone}
-							helperText={errors.serviceZone?.message}
-						/>
-					)}
-				/>
+				<Box sx={{ mt: 1.5 }}>
+					<Controller
+						control={control}
+						name="serviceZone"
+						rules={{
+							required: {
+								value: true,
+								message: localize("requiredInput"),
+							},
+						}}
+						render={({ field }) => (
+							<AutoCompleteCheckBox
+								{...field}
+								id="serviceZone"
+								name="serviceZone"
+								size="small"
+								noneOption
+								noneOptionLabel="Todos"
+								noneOptionValue="all"
+								label={localize("service.serviceZone")}
+								placeholder={"Seleccione"}
+								dataOptions={ubigeos?.map(item => ({ label: `${item.department} - ${item.province} - ${item.district}`, value: item.id })) || []}
+								loading={loadingUbigeos}
+								onSelectItem={(items: any) => {
+									setValue("serviceZone", items);
+								}}
+								error={!!errors.serviceZone}
+								helperText={errors.serviceZone?.message}
+							/>
+						)}
+					/>
+				</Box>
 				<UploadImage />
 				<Box sx={{ display: "flex", justifyContent: "end", mt: 2 }}>
 					<Button
 						variant="outlined"
 						color="secondary"
+						disabled={isLoading}
 						onClick={onCancel}
 						sx={{ mr: 1 }}
 					>
@@ -148,7 +175,8 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave }) => {
 					<Button
 						variant="contained"
 						color="primary"
-						onClick={handleSubmit(onSave)}
+						onClick={handleSubmit(handleFormSubmit)}
+						disabled={isLoading}
 						sx={{ ml: 1 }}
 					>
 						{localize("common.save")}

@@ -30,5 +30,16 @@ export const endpoints = {
 			updateProvider: '/providers/:id',
 			createProvider: '/providers',
 			updateProviderProfile: '/providers/custom-create-or-update',
+		},
+		service: {
+			getMyServices: '/services/get-services?pagination[page]=:page&pagination[pageSize]=:pageSize',
+			createService: '/services',
+			customCreateService: '/services/custom-create',
+		},
+		category: {
+			getCategories: '/categories',
+		},
+		ubigeo: {
+			getUbigeos: '/ubigeos',
 		}
 }

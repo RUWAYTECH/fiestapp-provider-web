@@ -1,12 +1,12 @@
+import { ServiceResponseDto } from "@/stateManagement/models/service/service-dto"
 import { Box, Card, CardContent, Chip, Stack, Typography } from "@mui/material"
-import type { Service } from "../services"
 
 interface ServiceListProps {
-  services: Service[]
-  onServiceClick?: (service: Service) => void
+  services: ServiceResponseDto[]
+	isLoading?: boolean
 }
 
-export function ServiceList({ services, onServiceClick }: ServiceListProps) {
+export function ServiceList({ services, isLoading }: ServiceListProps) {
   return (
     <Stack spacing={2}>
       {services.map((service) => (
@@ -15,13 +15,12 @@ export function ServiceList({ services, onServiceClick }: ServiceListProps) {
           variant="outlined"
           sx={{
             borderRadius: "8px",
-            cursor: onServiceClick ? "pointer" : "default",
+            cursor: "default",
             "&:hover": {
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              bgcolor: onServiceClick ? "rgba(0,0,0,0.01)" : "transparent",
+              bgcolor:  "transparent",
             },
           }}
-          onClick={() => onServiceClick && onServiceClick(service)}
         >
           <CardContent sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2 }}>
             <Box>
@@ -33,18 +32,24 @@ export function ServiceList({ services, onServiceClick }: ServiceListProps) {
               </Typography>
             </Box>
             <Chip
-              label={service.isActive ? "Activo" : "Inactivo"}
+              label={service.publishedAt ? "Publicado" : "Borrador"}
               size="small"
               sx={{
-                bgcolor: service.isActive ? "rgba(46, 204, 113, 0.1)" : "rgba(255, 99, 132, 0.1)",
-                color: service.isActive ? "#2ecc71" : "#ff6384",
+                bgcolor: service.publishedAt ? "rgba(46, 204, 113, 0.1)" : "rgba(255, 99, 132, 0.1)",
+                color: service.publishedAt ? "#2ecc71" : "#ff6384",
                 fontWeight: "medium",
                 borderRadius: "4px",
+								marginLeft: 2,
               }}
             />
           </CardContent>
         </Card>
       ))}
+			{isLoading && (
+				<Typography variant="body1" color="text.secondary">
+					Cargando servicios...
+				</Typography>
+			)}
     </Stack>
   )
 }
