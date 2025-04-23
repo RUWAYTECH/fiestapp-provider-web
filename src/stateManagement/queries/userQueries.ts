@@ -3,6 +3,7 @@ import { TagDescription } from "@reduxjs/toolkit/dist/query";
 import { ApiResponseDto } from "../models/api-response-dto";
 import { LoginResponseDto, LoginWithEmailDto, LoginWithGoogleDto } from "../models/auth/login";
 import { RegisterRequestDto } from "../models/auth/register";
+import { changePasswordDto } from "../models/user/userDto";
 
 export const loginMutation = {
   query: (data: LoginWithEmailDto) => {
@@ -57,6 +58,17 @@ export const resetPasswordMutation = {
     };
   },
   transformResponse: (response: any) => response,
+};
+
+export const changePasswordMutation = {
+	query: (data: changePasswordDto) => {
+		return {
+			url: ep.user.changePassword,
+			data: { data },
+			method: "POST",
+		};
+	},
+	transformResponse: (response: ApiResponseDto<LoginResponseDto>) => response,
 };
 
 export const allSelectUserQuery = {

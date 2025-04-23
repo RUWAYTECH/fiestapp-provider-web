@@ -133,6 +133,8 @@
 	"profile.facebook": "Facebook",
 	"profile.instagram": "Instagram",
 	"profile.updateProfile": "Actualizar perfil",
+	"profile.passwordChanged": "Contraseña cambiada con éxito",
+	"profile.passwordChangeError": "Ocurrió un error al cambiar la contraseña",
 
 	"updateProvider.title": "Actualizar datos de la empresa",
 	"updateProvider.businessName": "Nombre de la empresa",

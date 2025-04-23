@@ -72,7 +72,7 @@ const UpdateProvider = () => {
 	useEffect(() => {
 		if (userInfo.id) {
 			getProviderById(userInfo.id).unwrap().then((response) => {
-				const provider = response.data[0]
+				const provider = response?.data?.[0]
 				if (provider) {
 					setValue(updateProviderConstants.NAME, provider.name)
 					setValue(updateProviderConstants.DESCRIPTION, provider.description ?? "")

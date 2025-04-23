@@ -9,6 +9,7 @@ export const endpoints = {
 				register: '/auth/local/register',
         forgotPassword: '/auth/forgot-password',
         resetPassword: '/auth/reset-password',
+				changePassword: '/auth/change-password',
         allSelectUser: '/users',
         getUserByeRole: '/users?populate=role&filters[role][type][$eq]=:rolType&filters[name][$contains]=:params',
         allSearchchUser: '/users?filters[$or][0][name][$contains]=:searchParams&filters[$or][1][lastName][$contains]=:searchParams&filters[$or][2][documentIdentification][$contains]=:searchParams&populate=*',

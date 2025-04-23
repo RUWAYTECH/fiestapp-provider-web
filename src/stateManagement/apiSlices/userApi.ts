@@ -16,6 +16,7 @@ import {
   allUserRolQuery,
 	googleLoginQuery,
 	registerMutation,
+	changePasswordMutation,
 } from "../queries/userQueries";
 import { getAccountMenuQuery } from "../queries/accountQueries";
 
@@ -26,6 +27,7 @@ export const userApi = apiSlice.injectEndpoints({
 		register: build.mutation(registerMutation),
     forgotPassword: build.mutation(forgotPasswordMutation),
     resetPassword: build.mutation(resetPasswordMutation),
+		changePassword: build.mutation(changePasswordMutation),
     allSelectUser: build.query(allSelectUserQuery),
     getUserByeRole: build.query(getUserByeRoleQuery),
     allSearchUser: build.query(allSearchUserQuery),
@@ -46,6 +48,7 @@ export const {
 	useRegisterMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+	useChangePasswordMutation,
   useAllSelectUserQuery,
   useGetUserByeRoleQuery,
   useLazyGetUserByeRoleQuery,

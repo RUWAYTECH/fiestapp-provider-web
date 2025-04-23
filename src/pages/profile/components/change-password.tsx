@@ -1,9 +1,12 @@
 import CustomInput from '@/components/ui/input/CustomInput'
 import useYupValidationResolver from '@/core/hooks/useYupValidationResolver'
+import { dispatchNotifyStackError, dispatchNotifyStackSuccess } from '@/core/services/notistack'
+import { useChangePasswordMutation } from '@/stateManagement/apiSlices/userApi'
 import localize from '@/utils/localizer'
-import { Button } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
+import CircularProgress from '@mui/material/CircularProgress'
 
 const schema = Yup.object().shape({
 	currentPassword: Yup.string().required(localize("common.fieldRequired")),
@@ -13,7 +16,8 @@ const schema = Yup.object().shape({
 		.oneOf([Yup.ref('password'), ''], localize("common.passwordsMustMatch")),
 })
 
-const ChangePassword = () => {
+const ChangePassword = ({ disabled }: { disabled?: boolean }) => {
+	const [changePassword, { isLoading }] = useChangePasswordMutation()
 	const resolver = useYupValidationResolver(schema)
 
 	const { handleSubmit, control, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
@@ -23,15 +27,22 @@ const ChangePassword = () => {
 			passwordConfirmation: "",
 		},
 		resolver,
+		disabled: disabled,
 	})
 
 	const handleSubmitForm = (data: Yup.InferType<typeof schema>) => {
-		console.log("Form submitted", data)
-		// Aquí puedes manejar el envío del formulario, como hacer una llamada a la API
+		changePassword(data).unwrap().then(() => {
+			dispatchNotifyStackSuccess(localize("profile.passwordChanged"))
+		}).catch(() => {
+			dispatchNotifyStackError(localize("profile.passwordChangeError"))
+		})
 	}
 
 	return (
 		<form onSubmit={handleSubmit(handleSubmitForm)}>
+			<Typography variant="h5" component="h1" fontWeight="bold" mb={2}>
+				{localize("profile.changePassword")}
+			</Typography>
 			<CustomInput
 				id="currentPassword"
 				control={control}
@@ -56,7 +67,14 @@ const ChangePassword = () => {
 				error={!!errors.passwordConfirmation}
 				errorText={errors.passwordConfirmation ? errors.passwordConfirmation.message : ""}
 			/>
-			<Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+			<Button
+				type="submit"
+				variant="contained"
+				color="primary"
+				sx={{ mt: 2 }}
+				disabled={isLoading || disabled}
+				startIcon={isLoading ? <CircularProgress size={24} /> : null}
+			>
 				{localize("profile.changePassword")}
 			</Button>
 		</form>
