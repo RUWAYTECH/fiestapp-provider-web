@@ -42,5 +42,8 @@ export const endpoints = {
 		},
 		ubigeo: {
 			getUbigeos: '/ubigeos',
+		},
+		requestService: {
+			getRequestMyServices: '/request-services/get-request-service-by-provider?pagination[page]=:page&pagination[pageSize]=:pageSize',
 		}
 }

@@ -12,11 +12,13 @@ import {
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import { useTheme } from "@mui/material/styles"
+import { RequestServiceResponseDto } from "@/stateManagement/models/request-service/request-service-dto";
+import { formatDateddMMyyyy } from "@/utils/format/formatDates";
 
 interface TabsProps {
 	handleSubmitRegister: (data: any) => void;
 	loading: boolean;
-	data: any;
+	data: RequestServiceResponseDto[];
 	isEditing: boolean;
 	isDetail?: boolean;
 	handleClose?: () => void;
@@ -29,8 +31,8 @@ const RenderTabs: React.FC <TabsProps> = ({ handleSubmitRegister,handleClose, is
 	const [formState, setFormState] = useState<{ [key: number]: { budget: string; details: string } }>({})
 	const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
 
-	
-	const isEditable = (status: string) => status === "Pendiente"
+
+	const isEditable = (status: string) => status === "Solicitado" || status === "En proceso"
 
 	const toggleResponder = (id: number) => {
 		setOpenQuoteId((prev) => (prev === id ? null : id))
@@ -60,7 +62,7 @@ const RenderTabs: React.FC <TabsProps> = ({ handleSubmitRegister,handleClose, is
 		if (data) {
 			const initialQuantities: { [key: number]: number } = {};
 			data.forEach((quote) => {
-				quote.items.forEach((item) => {
+				quote.requestServiceDetails.forEach((item) => {
 					initialQuantities[item.id] = item.quantity;
 				})
 			})
@@ -88,13 +90,13 @@ const RenderTabs: React.FC <TabsProps> = ({ handleSubmitRegister,handleClose, is
 			[itemId]: Math.floor((prev[itemId] || 1) + 1),
 		}))
 	}
-	
+
 	const handleRemoveQuantity = (itemId: number) => {
 		setQuantities((prev) => {
 			const newValue = Math.max(1, (prev[itemId] || 1) - 1)
 			return { ...prev, [itemId]: newValue }
 		})
-	}	
+	}
 
 	return (
 		<Box>
@@ -112,41 +114,52 @@ const RenderTabs: React.FC <TabsProps> = ({ handleSubmitRegister,handleClose, is
 					>
 						<Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 1, flexWrap: "wrap", gap: 1 }}>
 							<Typography variant="caption" color="text.secondary">
-								Recibida: {quote.receivedDate}
+								Recibida: {quote.updatedAt ? formatDateddMMyyyy(quote.updatedAt) : ''}
 							</Typography>
 							<Typography
 								variant="body2"
 								sx={{
-									color: quote.status === "Pendiente" ? theme.palette.success.main : theme.palette.error.main,
+									color: quote.entityStatus === "Solicitado" ? theme.palette.success.main : theme.palette.error.main,
 									fontWeight: "bold",
 								}}
 							>
-								{quote.status}
+								{quote.entityStatus}
 							</Typography>
 						</Box>
 						<Typography variant="h6" sx={{ fontWeight: "bold" }}>
-							{quote.title}
+							{quote.message}
 						</Typography>
-						<Typography>Cliente: {quote.client}</Typography>
-						<Typography>Fecha del evento: {quote.eventDate}</Typography>
-						<Typography>Servicio: {quote.service}</Typography>
-						<Typography>Personas: {quote.people}</Typography>
+						{/* <Typography>Cliente: {quote.client}</Typography> */}
+						<Typography>Fecha del evento: {quote.registerDate ? formatDateddMMyyyy(quote.registerDate) : ''}</Typography>
+						<Typography>Servicio: {quote.requestServiceDetails.map((item) => item.service.name).join(", ")}</Typography>
+						<Typography>Presupuesto: S/ {quote.approximateBudget.toFixed(2)}</Typography>
+						<Typography>Personas: {quote.numberInvite}</Typography>
 
 						<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-							<Button
+							{openQuoteId === quote.id ? (
+								<Button
+								variant="outlined"
+								color="secondary"
+								onClick={() => toggleResponder(quote.id)}
+							>
+								Cancelar
+							</Button>
+							) : (
+								<Button
 								variant="outlined"
 								sx={{
-									color: quote.status === "Pendiente" ? "#fff" : theme.palette.primary.main,
-									backgroundColor: quote.status === "Pendiente" ? theme.palette.primary.main : "transparent",
+									color: quote.entityStatus === "Solicitado" ? "#fff" : theme.palette.primary.main,
+									backgroundColor: quote.entityStatus === "Solicitado" ? theme.palette.primary.main : "transparent",
 									borderColor: theme.palette.primary.main,
 									"&:hover": {
-										backgroundColor: quote.status === "Pendiente" ? theme.palette.primary.dark : theme.palette.secondary.light,
+										backgroundColor: quote.entityStatus === "Solicitado" ? theme.palette.primary.dark : theme.palette.secondary.light,
 									},
 								}}
 								onClick={() => toggleResponder(quote.id)}
 							>
-								{quote.status === "Pendiente" ? "Responder" : "Ver Detalles"}
+								{quote.entityStatus === "Solicitado" ? "Responder" : "Ver Detalles"}
 							</Button>
+						)}
 						</Box>
 
 						{openQuoteId === quote.id && (
@@ -159,7 +172,7 @@ const RenderTabs: React.FC <TabsProps> = ({ handleSubmitRegister,handleClose, is
 									Información del Evento
 								</Typography>
 
-								{quote.items.map((item) => (
+								{quote.requestServiceDetails.map((item) => (
 									<Grid
 										container
 										spacing={2}
@@ -171,31 +184,22 @@ const RenderTabs: React.FC <TabsProps> = ({ handleSubmitRegister,handleClose, is
 									>
 										<Grid item xs={12} md={6}>
 											<Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-												<img src={item.image} alt={item.name} width={60} height={60} style={{ borderRadius: 8 }} />
+												<img src={item.service.description} alt={item?.service?.name} width={60} height={60} style={{ borderRadius: 8 }} />
 												<Box>
-													<Typography>{item.name}</Typography>
-													<Typography color="text.secondary">S/ {item.price.toFixed(2)}</Typography>
+													<Typography>{item?.service?.name}</Typography>
+													<Typography color="text.secondary">S/ {item.priceFinal.toFixed(2)}</Typography>
 												</Box>
-											</Box>
-											<Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2 }}>
-												<IconButton disabled={!isEditable(quote.status)} onClick={() => handleRemoveQuantity(item.id)}>
-													<RemoveIcon />
-												</IconButton>
-												<Typography>{quantities[item.id]}</Typography>
-												<IconButton disabled={!isEditable(quote.status)} onClick={() => handleAddQuantity(item.id)}>
-													<AddIcon />
-												</IconButton>
 											</Box>
 										</Grid>
 
 										<Grid item xs={12} md={6}>
 											<TextField
-												label="Presupuesto Aproximado*"
+												label="Presupuesto final*"
 												fullWidth
 												size="small"
 												placeholder="Ej: 2000.00"
 												sx={{ mb: 2 }}
-												disabled={!isEditable(quote.status)}
+												disabled={!isEditable(quote.entityStatus)}
 												value={formState[item.id]?.budget || ""}
 												onChange={(e) => handleChangeItemBudget(item.id, e.target.value)}
 											/>
@@ -206,23 +210,22 @@ const RenderTabs: React.FC <TabsProps> = ({ handleSubmitRegister,handleClose, is
 												rows={3}
 												placeholder="Describa aquí cualquier detalle adicional..."
 												sx={{ mb: 2 }}
-												disabled={!isEditable(quote.status)}
+												disabled={!isEditable(quote.entityStatus)}
 												value={formState[item.id]?.details || ""}
 												onChange={(e) => handleChangeItemDetails(item.id, e.target.value)}
 											/>
-											{isEditable(quote.status) && (
-												<Button
-													variant="contained"
-													fullWidth
-													sx={{ backgroundColor: theme.palette.primary.main }}
-													onClick={() => handleSendRequest(item.id)}
-												>
-													Enviar Solicitud
-												</Button>
-											)}
 										</Grid>
 									</Grid>
 								))}
+
+								{isEditable(quote.entityStatus) && (
+									<Button
+										variant="contained"
+										color="primary"
+									>
+										Enviar cotizacion
+									</Button>
+								)}
 							</>
 						)}
 					</Card>

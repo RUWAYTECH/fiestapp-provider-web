@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Box,
 	Card,
@@ -8,126 +8,21 @@ import {
 	Divider,
 } from "@mui/material";
 import RenderTabs from "./components/render-tabs";
-
-const quoteData = [
-	{
-		id: 1,
-		receivedDate: "14 Abril, 2025",
-		title: "Evento de Cumpleaños",
-		client: "Laura Martínez",
-		eventDate: "25 Mayo, 2025",
-		service: "Paquete Básico de Catering",
-		people: 35,
-		status: "Pendiente",
-		items: [
-			{
-				id: 101,
-				name: "Los gustitos infantiles",
-				price: 2500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-			{
-				id: 102,
-				name: "El Rincón Festivo",
-				price: 1500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-		],
-	},
-	{
-		id: 2,
-		receivedDate: "10 Abril, 2025",
-		title: "Fiesta Corporativa",
-		client: "Carlos Rodríguez",
-		eventDate: "15 Mayo, 2025",
-		service: "Paquete Premium de Catering",
-		people: 75,
-		status: "Respondida",
-		items: [
-			{
-				id: 201,
-				name: "Los gustitos infantiles",
-				price: 2500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-			{
-				id: 202,
-				name: "El Rincón Festivo",
-				price: 1500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-		],
-	},
-];
-
-const quoteDataPending = [
-	{
-		id: 1,
-		receivedDate: "14 Abril, 2025",
-		title: "Evento de Cumpleaños",
-		client: "Laura Martínez",
-		eventDate: "25 Mayo, 2025",
-		service: "Paquete Básico de Catering",
-		people: 35,
-		status: "Pendiente",
-		items: [
-			{
-				id: 101,
-				name: "Los gustitos infantiles",
-				price: 2500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-			{
-				id: 102,
-				name: "El Rincón Festivo",
-				price: 1500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-		],
-	},
-];
-const quoteDataResponsed = [
-	{
-		id: 2,
-		receivedDate: "10 Abril, 2025",
-		title: "Fiesta Corporativa",
-		client: "Carlos Rodríguez",
-		eventDate: "15 Mayo, 2025",
-		service: "Paquete Premium de Catering",
-		people: 75,
-		status: "Respondida",
-		items: [
-			{
-				id: 201,
-				name: "Los gustitos infantiles",
-				price: 2500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-			{
-				id: 202,
-				name: "El Rincón Festivo",
-				price: 1500,
-				quantity: 1,
-				image: "https://via.placeholder.com/60",
-			},
-		],
-	},
-];
+import { useLazyGetRequestMyServicesQuery } from "@/stateManagement/apiSlices/requestServiceApi";
 
 
-const Quotes: React.FC = () => {
+const Quotes = () => {
 	const [tabIndex, setTabIndex] = useState(0);
+	const [pagination, setPagination] = useState({ page: 1, pageSize: 10 })
+	const [getQuotes, { data: res, isLoading }] = useLazyGetRequestMyServicesQuery();
 
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setTabIndex(newValue);
 	}
+
+	useEffect(() => {
+		getQuotes({ ...pagination, state: tabIndex === 0 ? undefined : tabIndex === 1 ? 'Solicitado' : 'En proceso' }).unwrap()
+	}, [pagination, tabIndex])
 
 	return (
 		<Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -174,8 +69,8 @@ const Quotes: React.FC = () => {
 						handleSubmitRegister={() => { }}
 						handleClose={() => { }}
 						isEditing={false}
-						loading={false}
-						data={quoteData}
+						loading={isLoading}
+						data={res?.data || []}
 					/>
 				)}
 				{tabIndex === 1 && (
@@ -183,8 +78,8 @@ const Quotes: React.FC = () => {
 						handleSubmitRegister={() => { }}
 						handleClose={() => { }}
 						isEditing={false}
-						loading={false}
-						data={quoteDataPending}
+						loading={isLoading}
+						data={res?.data || []}
 					/>
 				)}
 				{tabIndex === 2 && (
@@ -192,8 +87,8 @@ const Quotes: React.FC = () => {
 						handleSubmitRegister={() => { }}
 						handleClose={() => { }}
 						isEditing={false}
-						loading={false}
-						data={quoteDataResponsed}
+						loading={isLoading}
+						data={res?.data || []}
 					/>
 				)}
 			</Card>
