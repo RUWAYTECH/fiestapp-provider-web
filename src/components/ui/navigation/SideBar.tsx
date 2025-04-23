@@ -11,7 +11,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Zoom from "@mui/material/Zoom";
 import Box from "@mui/material/Box";
-import MiIcono from "@/assets/logoProject.png";
+import MiIcono from "@/assets/logo.png";
 import HomeIcon from "@mui/icons-material/Home";
 import UpdateProviderIcon from "@mui/icons-material/ManageAccounts";
 import QuotesIcon from "@mui/icons-material/AttachMoney";
@@ -156,14 +156,16 @@ function SideBar({ open, setOpen }: SideBarProps) {
             justifyContent: "center",
             alignItems: "center",
             width: "100%",
+						fontWeight: 'bold',
+						fontSize: '20px'
           }}
         >
           <img
             src={MiIcono}
-            style={{ width: "40px", height: "auto", marginRight: "20px" }}
+            style={{ width: "25px", height: "auto", marginRight: "20px" }}
             alt="Icono"
           />
-          Template
+          Fiest<span style={{ color: '#e7000b' }}>App</span>
         </Box>
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === "rtl" ? (
