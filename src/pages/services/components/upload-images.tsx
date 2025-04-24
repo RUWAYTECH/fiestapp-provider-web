@@ -1,25 +1,25 @@
-import { Paper, useTheme } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { Paper, useTheme, CircularProgress, IconButton } from '@mui/material'
 import { useDropzone } from 'react-dropzone'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 const thumbsContainer = {
 	display: 'flex',
 	flexDirection: 'row',
 	flexWrap: 'wrap',
-	marginTop: 16
+	marginTop: 16,
+	gap: 8,
 } as const
 
-const thumb = {
+const thumb = (status: string) => ({
 	display: 'inline-flex',
 	borderRadius: 2,
-	border: '1px solid #eaeaea',
-	marginBottom: 8,
-	marginRight: 8,
+	border: `2px solid ${status === 'success' ? 'green' : status === 'error' ? 'red' : '#eaeaea'}`,
 	width: 100,
 	height: 100,
-	padding: 4,
-	boxSizing: 'border-box' as const
-}
+	padding: 2,
+	boxSizing: 'border-box' as const,
+	position: 'relative'
+}) as const
 
 const thumbInner = {
 	display: 'flex',
@@ -33,50 +33,90 @@ const img = {
 	height: '100%'
 } as const
 
+export interface ImageFile {
+	id: string | number
+	name: string
+	url: string
+	state: 'loading' | 'success' | 'error'
+}
 
-const UploadImage = () => {
-	const [files, setFiles] = useState<any[]>([])
+interface UploadImageProps {
+	uploadFile: (file: File) => void
+	deleteFile: (fileId: string | number) => void
+	uploadedFiles: ImageFile[]
+}
+
+const UploadImage = ({ uploadFile, deleteFile, uploadedFiles }: UploadImageProps) => {
 	const theme = useTheme()
 
 	const { getRootProps, getInputProps } = useDropzone({
+		multiple: false,
 		accept: {
 			'image/*': []
 		},
 		onDrop: acceptedFiles => {
-			setFiles(acceptedFiles.map(file => Object.assign(file, {
-				preview: URL.createObjectURL(file)
-			})))
+			uploadFile(acceptedFiles[0])
 		}
 	})
 
-	const thumbs = files.map(file => (
-		<div style={thumb} key={file.name}>
+	const thumbs = uploadedFiles.map(file => (
+		<div style={thumb(file.state)} key={file.id}>
 			<div style={thumbInner}>
 				<img
-					src={file.preview}
+					src={file.url}
 					style={img}
-					// Revoke data uri after image is loaded
-					onLoad={() => { URL.revokeObjectURL(file.preview) }}
+					alt="preview"
 				/>
 			</div>
+			{file.state === 'loading' && (
+				<div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+					<CircularProgress
+						size={25}
+						style={{ position: 'absolute' }}
+					/>
+				</div>
+			)}
+			<IconButton
+				aria-label="delete"
+				sx={{
+					backgroundColor: theme.palette.error.main,
+					color: 'white',
+					position: 'absolute',
+					top: 0,
+					right: 2,
+					'&:hover': { backgroundColor: theme.palette.error.dark },
+					'&:active': { backgroundColor: theme.palette.error.light },
+					'&:focus': { backgroundColor: theme.palette.error.light },
+					'&:disabled': { backgroundColor: theme.palette.error.dark, color: 'white', opacity: 0.5 }
+				}}
+				edge="end"
+				size='small'
+				onClick={() => deleteFile(file.id)}
+				disabled={file.state === 'loading'}
+			>
+				<DeleteIcon fontSize="small" />
+			</IconButton>
 		</div>
 	))
 
-	useEffect(() => {
-		// Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-		return () => files.forEach(file => URL.revokeObjectURL(file.preview))
-	}, [files])
-
 	return (
 		<section style={{ marginTop: '20px' }}>
-			<Paper {...getRootProps({ className: 'dropzone' })} sx={{ backgroundColor: theme.palette.background.paper, padding: 2, borderRadius: 2, border: '1px dashed', borderColor: theme.palette.primary.main, cursor: 'pointer', '&:hover': { backgroundColor: theme.palette.background.default } }}>
-				<input {...getInputProps()} />
-				{/* <p>Drag 'n' drop some files here, or click to select files</p> */}
+			<Paper
+				{...getRootProps({ className: 'dropzone' })}
+				sx={{
+					backgroundColor: theme.palette.background.paper,
+					padding: 2,
+					borderRadius: 2,
+					border: '1px dashed',
+					borderColor: theme.palette.primary.main,
+					cursor: 'pointer',
+					'&:hover': { backgroundColor: theme.palette.background.default }
+				}}
+			>
+				<input {...getInputProps()} disabled={uploadedFiles.some(file => file.state === 'loading')} />
 				<p>Arrastra y suelta algunas imágenes aquí, o haz clic para seleccionar imágenes</p>
 			</Paper>
-			<aside style={thumbsContainer}>
-				{thumbs}
-			</aside>
+			<aside style={thumbsContainer}>{thumbs}</aside>
 		</section>
 	)
 }

@@ -6,10 +6,13 @@ import localize from '@/utils/localizer'
 import { Box, Button, Grid } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
-import UploadImage from './upload-images'
+import UploadImage, { ImageFile } from './upload-images'
 import { useGetCategoriesQuery } from '@/stateManagement/apiSlices/categoryApi'
 import { useGetUbigeosQuery } from '@/stateManagement/apiSlices/ubigeoApi'
 import { ServiceRequestDto } from '@/stateManagement/models/service/service-dto'
+import { useState } from 'react'
+import { useUploadMutation } from '@/stateManagement/apiSlices/uploadApi'
+import { v4 as uuidv4 } from 'uuid'
 
 const schema = Yup.object().shape({
 	name: Yup.string().required(localize("common.fieldRequired")),
@@ -32,6 +35,7 @@ interface ServiceFormProps {
 
 const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }) => {
 	const resolver = useYupValidationResolver(schema)
+	const [uploadedFiles, setUploadedFiles] =  useState<ImageFile[]>([])
 
 	const { handleSubmit, control, setValue, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
 		defaultValues: {
@@ -48,6 +52,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 
 	const { data: categories, isLoading: loadingCategories } = useGetCategoriesQuery(undefined)
 	const { data: ubigeos, isLoading: loadingUbigeos } = useGetUbigeosQuery(undefined)
+	const [uploadFile] = useUploadMutation()
 
 	const handleFormSubmit = (data: Yup.InferType<typeof schema>) => {
 		onSave({
@@ -60,6 +65,39 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 			fileImage: data.attachments,
 			score: 5
 		})
+	}
+
+	const handleUploadFile = (file: File) => {
+		const formData = new FormData()
+
+		formData.append("files[]", file)
+
+		const uploadingFile: ImageFile = {
+			id: uuidv4(),
+			name: file.name,
+			url: URL.createObjectURL(file),
+			state: "loading",
+		}
+
+		setUploadedFiles((prev) => [...prev, uploadingFile])
+
+		uploadFile(formData).unwrap().then((response) => {
+			const newFile: ImageFile = {
+				id: response[0].id,
+				name: file.name,
+				url: response[0].url,
+				state: "success",
+			}
+			setUploadedFiles((prev) => prev.map((item) => (item.id === uploadingFile.id ? newFile : item)))
+			setValue("attachments", [...uploadedFiles.map(item => item.id.toString()), newFile.id.toString()])
+		}).catch(() => {
+			setUploadedFiles((prev) => prev.map((item) => (item.id === uploadingFile.id ? { ...item, state: "error" } : item)))
+		})
+	}
+
+	const handleDeleteFile = (fileId: string | number) => {
+		setUploadedFiles((prev) => prev.filter((item) => item.id !== fileId))
+		setValue("attachments", uploadedFiles.filter(item => item.id !== fileId).map(item => item.id.toString()))
 	}
 
 	return (
@@ -161,7 +199,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 						)}
 					/>
 				</Box>
-				<UploadImage />
+				<UploadImage uploadFile={handleUploadFile} uploadedFiles={uploadedFiles} deleteFile={handleDeleteFile} />
 				<Box sx={{ display: "flex", justifyContent: "end", mt: 2 }}>
 					<Button
 						variant="outlined"
