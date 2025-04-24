@@ -61,7 +61,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 			priceMin: data.minPrice,
 			priceMax: data.maxPrice,
 			category: data.category,
-			localizations: data.serviceZone.map((item) => item.value),
+			ubigeos: data.serviceZone.map((item) => item.value),
 			fileImage: data.attachments,
 			score: 5
 		})

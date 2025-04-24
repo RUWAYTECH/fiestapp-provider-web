@@ -22,6 +22,6 @@ export interface ServiceRequestDto {
 	priceMax: number
 	score: number
 	category: string
-	localizations: number[]
+	ubigeos: number[]
 	fileImage: string[]
 }
