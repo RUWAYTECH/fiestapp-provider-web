@@ -29,3 +29,22 @@ export interface RequestServiceResponseDto {
   totalPriceFinal: number | null;
   requestServiceDetails: RequestServiceDetailResponseDto[];
 }
+
+export interface RequestServiceDetailRequestDto {
+  id: number;
+  comment: string;
+  quantity: number;
+  priceFinal: number;
+  service: number;
+}
+
+export interface RequestServiceRequestDto {
+  message: string;
+  totalPrice: number;
+  registerDate: string;
+  entityStatus: 'Solicitado' | 'En proceso' | 'Atendido';
+  provider?: string;
+  numberInvite: number;
+  approximateBudget: number;
+  requestServiceDetail: RequestServiceDetailRequestDto[];
+}

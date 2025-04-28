@@ -49,6 +49,7 @@ export const endpoints = {
 		},
 		requestService: {
 			getRequestMyServices: '/request-services/get-request-service-by-provider?pagination[page]=:page&pagination[pageSize]=:pageSize',
+			customUpdateRequestService: '/request-services/custom-update/:id',
 		},
 		uploadFile: {
 			upload: '/upload',

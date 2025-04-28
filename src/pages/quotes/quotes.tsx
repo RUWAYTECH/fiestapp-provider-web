@@ -6,6 +6,7 @@ import {
 	Tabs,
 	Tab,
 	Divider,
+	Pagination,
 } from "@mui/material";
 import RenderTabs from "./components/render-tabs";
 import { useLazyGetRequestMyServicesQuery } from "@/stateManagement/apiSlices/requestServiceApi";
@@ -16,13 +17,18 @@ const Quotes = () => {
 	const [pagination, setPagination] = useState({ page: 1, pageSize: 10 })
 	const [getQuotes, { data: res, isLoading }] = useLazyGetRequestMyServicesQuery();
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+	const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
 		setTabIndex(newValue);
 	}
 
 	useEffect(() => {
 		getQuotes({ ...pagination, state: tabIndex === 0 ? undefined : tabIndex === 1 ? 'Solicitado' : 'En proceso' }).unwrap()
 	}, [pagination, tabIndex])
+
+	const totalPages = (total: number, pageSize: number) => {
+		if (total === 0) return 1
+		return Math.ceil(total / pageSize)
+	}
 
 	return (
 		<Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -66,30 +72,24 @@ const Quotes = () => {
 
 				{tabIndex === 0 && (
 					<RenderTabs
-						handleSubmitRegister={() => { }}
-						handleClose={() => { }}
-						isEditing={false}
 						loading={isLoading}
 						data={res?.data || []}
 					/>
 				)}
 				{tabIndex === 1 && (
 					<RenderTabs
-						handleSubmitRegister={() => { }}
-						handleClose={() => { }}
-						isEditing={false}
 						loading={isLoading}
 						data={res?.data || []}
 					/>
 				)}
 				{tabIndex === 2 && (
 					<RenderTabs
-						handleSubmitRegister={() => { }}
-						handleClose={() => { }}
-						isEditing={false}
 						loading={isLoading}
 						data={res?.data || []}
 					/>
+				)}
+				{!isLoading && (
+					<Pagination count={totalPages(res?.meta?.pagination.total ?? 0, pagination.pageSize)} page={pagination.page} onChange={(_e, page) => setPagination({ ...pagination, page })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
 				)}
 			</Card>
 		</Box>
