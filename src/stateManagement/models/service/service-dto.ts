@@ -1,4 +1,6 @@
 import { ProviderResponseDto } from "../provider/provider-dto"
+import { UbigeoResponseDto } from "../ubigeo/ubigeo-dto"
+import { UploadFileResponseDto } from "../upload/upload-file-dto"
 
 export interface ServiceResponseDto {
 	id: number
@@ -13,6 +15,12 @@ export interface ServiceResponseDto {
 	publishedAt: string
 	locale: string | null
 	provider: ProviderResponseDto
+	state: boolean | null
+	ubigeoServices?: {
+		id: number
+		ubigeo: UbigeoResponseDto
+	}[]
+	fileImage?: UploadFileResponseDto[]
 }
 
 export interface ServiceRequestDto {
@@ -24,4 +32,5 @@ export interface ServiceRequestDto {
 	category: string
 	ubigeos: number[]
 	fileImage: string[]
+	state?: boolean | null
 }

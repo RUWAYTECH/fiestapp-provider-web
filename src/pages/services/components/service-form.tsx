@@ -3,16 +3,17 @@ import CustomInput from '@/components/ui/input/CustomInput'
 import SelectTextField from '@/components/ui/selectTextField/SelectTextField'
 import useYupValidationResolver from '@/core/hooks/useYupValidationResolver'
 import localize from '@/utils/localizer'
-import { Box, Button, Grid } from '@mui/material'
+import { Box, Button, FormHelperText, Grid } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 import UploadImage, { ImageFile } from './upload-images'
 import { useGetCategoriesQuery } from '@/stateManagement/apiSlices/categoryApi'
 import { useGetUbigeosQuery } from '@/stateManagement/apiSlices/ubigeoApi'
-import { ServiceRequestDto } from '@/stateManagement/models/service/service-dto'
-import { useState } from 'react'
+import { ServiceRequestDto, ServiceResponseDto } from '@/stateManagement/models/service/service-dto'
+import { useEffect, useState } from 'react'
 import { useUploadMutation } from '@/stateManagement/apiSlices/uploadApi'
 import { v4 as uuidv4 } from 'uuid'
+import Config from '@/core/config/config'
 
 const schema = Yup.object().shape({
 	name: Yup.string().required(localize("common.fieldRequired")),
@@ -23,17 +24,18 @@ const schema = Yup.object().shape({
 	serviceZone: Yup.array().of(Yup.object().shape({
 		value: Yup.number().required(localize("common.fieldRequired")),
 		label: Yup.string().required(localize("common.fieldRequired")),
-	})).required(localize("common.fieldRequired")),
-	attachments: Yup.array().of(Yup.string().required(localize("common.fieldRequired"))).required(localize("common.fieldRequired")),
+	})).min(1, localize("common.fieldRequired")).required(localize("common.fieldRequired")),
+	attachments: Yup.array().of(Yup.string().required(localize("common.fieldRequired"))).min(1, localize("common.fieldRequired")).required(localize("common.fieldRequired")),
 })
 
 interface ServiceFormProps {
+	data?: ServiceResponseDto | null
 	onCancel: () => void
 	onSave: (data: ServiceRequestDto) => void
 	isLoading?: boolean
 }
 
-const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }) => {
+const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoading }) => {
 	const resolver = useYupValidationResolver(schema)
 	const [uploadedFiles, setUploadedFiles] =  useState<ImageFile[]>([])
 
@@ -70,7 +72,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 	const handleUploadFile = (file: File) => {
 		const formData = new FormData()
 
-		formData.append("files[]", file)
+		formData.append("files", file)
 
 		const uploadingFile: ImageFile = {
 			id: uuidv4(),
@@ -85,7 +87,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 			const newFile: ImageFile = {
 				id: response[0].id,
 				name: file.name,
-				url: response[0].url,
+				url: Config.baseUrl + response[0].url,
 				state: "success",
 			}
 			setUploadedFiles((prev) => prev.map((item) => (item.id === uploadingFile.id ? newFile : item)))
@@ -99,6 +101,27 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 		setUploadedFiles((prev) => prev.filter((item) => item.id !== fileId))
 		setValue("attachments", uploadedFiles.filter(item => item.id !== fileId).map(item => item.id.toString()))
 	}
+
+	useEffect(() => {
+		if (data) {
+			setValue("name", data.name)
+			setValue("description", data.description)
+			setValue("minPrice", data.priceMin)
+			setValue("maxPrice", data.priceMax)
+			/* setValue("category", data.category) */
+			setValue("serviceZone", data.ubigeoServices?.map((item) => ({
+				label: `${item.ubigeo?.department} - ${item.ubigeo?.province} - ${item.ubigeo?.district}`,
+				value: item.ubigeo?.id,
+			})) || [])
+			setValue("attachments", data.fileImage?.map((item) => item.id.toString()) || [])
+			setUploadedFiles(data.fileImage?.map((item) => ({
+				id: item.id,
+				name: item.name,
+				url: Config.baseUrl + item.url,
+				state: "success",
+			})) || [])
+		}
+	}, [data, setValue])
 
 	return (
 		<div style={{ width: "100%" }}>
@@ -199,7 +222,14 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ onCancel, onSave, isLoading }
 						)}
 					/>
 				</Box>
-				<UploadImage uploadFile={handleUploadFile} uploadedFiles={uploadedFiles} deleteFile={handleDeleteFile} />
+				<Box sx={{ mt: 1.5 }}>
+					<UploadImage uploadFile={handleUploadFile} uploadedFiles={uploadedFiles} deleteFile={handleDeleteFile} />
+					{errors.attachments && (
+						<FormHelperText error sx={{ mt: 1 }}>
+							{errors.attachments?.message}
+						</FormHelperText>
+					)}
+				</Box>
 				<Box sx={{ display: "flex", justifyContent: "end", mt: 2 }}>
 					<Button
 						variant="outlined"

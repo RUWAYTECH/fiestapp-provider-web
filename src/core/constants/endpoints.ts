@@ -33,9 +33,13 @@ export const endpoints = {
 			updateProviderProfile: '/providers/custom-create-or-update',
 		},
 		service: {
-			getMyServices: '/services/get-services?pagination[page]=:page&pagination[pageSize]=:pageSize',
+			getMyServices: '/services/get-services?populate=*&pagination[page]=:page&pagination[pageSize]=:pageSize',
 			createService: '/services',
 			customCreateService: '/services/custom-create',
+			getServiceById: '/services/service-by-id/:id',
+			customUpdateService: '/services/custom-update/:id',
+			deleteService: '/services/:id',
+			changeStateService: '/services/change-state/:id',
 		},
 		category: {
 			getCategories: '/categories',

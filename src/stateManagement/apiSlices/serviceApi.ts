@@ -1,4 +1,4 @@
-import { createServiceMutation, customCreateServiceMutation, getMyServicesQuery } from "../queries/serviceQueries";
+import { createServiceMutation, customCreateServiceMutation, getMyServicesQuery, getServiceByIdQuery, customUpdateServiceMutation, deleteServiceMutation, changeStateServiceMutation } from "../queries/serviceQueries";
 import apiSlice from "./apiSlice";
 
 export const serviceApi = apiSlice.injectEndpoints({
@@ -6,6 +6,10 @@ export const serviceApi = apiSlice.injectEndpoints({
 		getMyServices: build.query(getMyServicesQuery),
 		createService: build.mutation(createServiceMutation),
 		customCreateService: build.mutation(customCreateServiceMutation),
+		getServiceById: build.query(getServiceByIdQuery),
+		customUpdateService: build.mutation(customUpdateServiceMutation),
+		deleteService: build.mutation(deleteServiceMutation),
+		changeStateService: build.mutation(changeStateServiceMutation),
 	}),
 
 });
@@ -15,4 +19,9 @@ export const {
 	useLazyGetMyServicesQuery,
 	useCreateServiceMutation,
 	useCustomCreateServiceMutation,
+	useGetServiceByIdQuery,
+	useLazyGetServiceByIdQuery,
+	useCustomUpdateServiceMutation,
+	useDeleteServiceMutation,
+	useChangeStateServiceMutation,
 } = serviceApi;

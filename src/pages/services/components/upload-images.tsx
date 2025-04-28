@@ -100,7 +100,7 @@ const UploadImage = ({ uploadFile, deleteFile, uploadedFiles }: UploadImageProps
 	))
 
 	return (
-		<section style={{ marginTop: '20px' }}>
+		<section>
 			<Paper
 				{...getRootProps({ className: 'dropzone' })}
 				sx={{

@@ -43,3 +43,52 @@ export const customCreateServiceMutation = {
 	},
 	invalidatesTags: [{ type: "Service" as "Service", id: "SERVICE_LIST" }],
 };
+
+export const getServiceByIdQuery = {
+	query: (id: number) => {
+		const path = ep.service.getServiceById.replace(":id", id.toString());
+		return {
+			url: path,
+			method: "GET",
+		};
+	},
+	keepUnusedDataFor: 0,
+	transformResponse: (response: ApiResponseDto<ServiceResponseDto>) => response,
+	providesTags: (result?: ApiResponseDto<ServiceResponseDto>) => {
+		return result ? [{ type: "Service" as "Service", id: result.id }] : [];
+	},
+};
+
+export const customUpdateServiceMutation = {
+	query: ({ id, data }: { id: number; data: ServiceRequestDto }) => {
+		const path = ep.service.customUpdateService.replace(":id", id.toString());
+		return {
+			url: path,
+			method: "PUT",
+			data: { data },
+		};
+	},
+	invalidatesTags: [{ type: "Service" as "Service", id: "SERVICE_LIST" }],
+};
+
+export const deleteServiceMutation = {
+	query: (id: number) => {
+		const path = ep.service.deleteService.replace(":id", id.toString());
+		return {
+			url: path,
+			method: "DELETE",
+		};
+	},
+	invalidatesTags: [{ type: "Service" as "Service", id: "SERVICE_LIST" }],
+};
+
+export const changeStateServiceMutation = {
+	query: (id: number) => {
+		const path = ep.service.changeStateService.replace(":id", id.toString());
+		return {
+			url: path,
+			method: "PATCH",
+		};
+	},
+	invalidatesTags: [{ type: "Service" as "Service", id: "SERVICE_LIST" }],
+};
