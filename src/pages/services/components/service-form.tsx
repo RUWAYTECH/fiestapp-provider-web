@@ -108,7 +108,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoa
 			setValue("description", data.description)
 			setValue("minPrice", data.priceMin)
 			setValue("maxPrice", data.priceMax)
-			/* setValue("category", data.category) */
+			setValue("category", data.category ? data.category.id.toString() : "")
 			setValue("serviceZone", data.ubigeoServices?.map((item) => ({
 				label: `${item.ubigeo?.department} - ${item.ubigeo?.province} - ${item.ubigeo?.district}`,
 				value: item.ubigeo?.id,
@@ -121,7 +121,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoa
 				state: "success",
 			})) || [])
 		}
-	}, [data, setValue])
+	}, [data])
 
 	return (
 		<div style={{ width: "100%" }}>

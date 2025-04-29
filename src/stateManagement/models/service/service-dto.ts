@@ -1,3 +1,4 @@
+import { CategoryResponseDto } from "../category/category-dto"
 import { ProviderResponseDto } from "../provider/provider-dto"
 import { UbigeoResponseDto } from "../ubigeo/ubigeo-dto"
 import { UploadFileResponseDto } from "../upload/upload-file-dto"
@@ -16,6 +17,7 @@ export interface ServiceResponseDto {
 	locale: string | null
 	provider: ProviderResponseDto
 	state: boolean | null
+	category?: CategoryResponseDto
 	ubigeoServices?: {
 		id: number
 		ubigeo: UbigeoResponseDto

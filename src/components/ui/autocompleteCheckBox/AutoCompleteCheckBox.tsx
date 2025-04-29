@@ -59,9 +59,11 @@ const AutoCompleteCheckBox = forwardRef<HTMLDivElement, AutoCompleteProps>(
 
 
     useEffect(() => {
-      if ((!value || value.length === 0) && JSON.stringify(allValue) !== "[]") {
+			if ((!value || value.length === 0) && JSON.stringify(allValue) !== "[]") {
         setAllValue([]);
-      }         
+      } else {
+				setAllValue(value || []);
+			}
     }, [value]);
 
     const noneItem = {
