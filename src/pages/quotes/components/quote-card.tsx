@@ -13,6 +13,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { formatDateddMMyyyy } from "@/utils/format/formatDates";
 import { RequestServiceResponseDto } from "@/stateManagement/models/request-service/request-service-dto";
+import Config from "@/core/config/config";
 
 interface QuoteCardProps {
 	quote: RequestServiceResponseDto;
@@ -36,7 +37,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 				priceMax: item.service.priceMax,
 				priceFinal: item.priceFinal,
 				quantity: item.quantity,
-				image: item.service.description,
+				image: `${Config.baseUrl}${item.service.fileImage?.[0]?.url}`,
 				serviceId: item.service.id,
 				budget: item.priceFinal.toFixed(2),
 				comment: item.comment,
@@ -116,7 +117,8 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 							backgroundColor: quote.entityStatus === "Solicitado" ? theme.palette.primary.main : "transparent",
 							borderColor: theme.palette.primary.main,
 							"&:hover": {
-								backgroundColor: quote.entityStatus === "Solicitado" ? theme.palette.primary.dark : theme.palette.secondary.light,
+								backgroundColor: quote.entityStatus === "Solicitado" ? theme.palette.primary.dark : theme.palette.primary.light,
+								color: "#fff",
 							},
 						}}
 						onClick={() => setIsOpen(!isOpen)}
@@ -150,8 +152,8 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 									<img
 										src={item?.image}
 										alt={item?.name}
-										width={60}
-										height={60}
+										width={90}
+										height={90}
 										style={{ borderRadius: 8 }}
 									/>
 									<Box>
