@@ -23,7 +23,7 @@ const Profile = () => {
 					fullWidth
 					margin="normal"
 					disabled
-					value={userInfo?.username || ""}
+					value={userInfo?.name || ""}
 				/>
 				<TextField
 					label="Correo Electrónico"

@@ -1,28 +1,19 @@
-export interface ProviderResponseDto {
-	id: number
-	documentId: string
-	name: string
-	description: string | null
-	address: string
-	email: string
-	isActive: boolean
-	createdAt: string
-	updatedAt: string
-	publishedAt: string
-	website: string | null
-	phone: string | null
-	businessAddress: string | null
-	facebookUrl: string | null
-	instagramUrl: string | null
+export interface ProviderCommonDto {
+	name: string;
+	description: string;
+	picture: string;
+	address: string;
+	email: string;
+	website: string;
+	phone: string;
+	facebook: string;
+	instagram: string;
+	status: boolean;
 }
 
-export interface ProviderRequestDto {
-	name: string
-	description: string
-	email: string
-	phone: string
-	address: string
-	website?: string
-	facebookUrl?: string
-	instagramUrl?: string
+
+export interface ProviderResponseDto extends ProviderCommonDto {
+	id: number
 }
+
+export interface ProviderRequestDto extends ProviderCommonDto {}

@@ -3,6 +3,7 @@ import { RequestServiceRequestDto, RequestServiceResponseDto } from "@/stateMana
 import QuoteCard from "./quote-card";
 import { useCustomUpdateRequestServiceMutation } from "@/stateManagement/apiSlices/requestServiceApi";
 import { dispatchNotifyStackError, dispatchNotifyStackSuccess } from "@/core/services/notistack";
+import { RequestStatus } from "@/core/constants/requestStatus";
 
 interface TabsProps {
 	loading: boolean;
@@ -12,7 +13,7 @@ interface TabsProps {
 const RenderTabs: React.FC <TabsProps> = ({ loading, data}) => {
 	const [updateRequestService, { isLoading }] = useCustomUpdateRequestServiceMutation();
 
-	const isEditable = (status: string) => status === "Solicitado"
+	const isEditable = (status: RequestStatus) => status === RequestStatus.REQUESTED
 
 	if (loading) {
 		return (
@@ -22,22 +23,12 @@ const RenderTabs: React.FC <TabsProps> = ({ loading, data}) => {
 		);
 	}
 
-	const handleSubmitForm = (refData: RequestServiceResponseDto, formData: { id: number, budget: string; comment: string; quantity: number; serviceId: number }[]) => {
+	const handleSubmitForm = (refData: RequestServiceResponseDto, formData: { id: string, budget: string; comment: string; quantity: number; serviceId: string }[]) => {
 		const formattedData: RequestServiceRequestDto = {
-			message: refData.message,
-			approximateBudget: refData.approximateBudget,
-			numberInvite: refData.numberInvite,
-			totalPrice: refData.totalPrice,
-			registerDate: refData.registerDate,
-			//entityStatus: refData.entityStatus,
-			entityStatus: 'En proceso',
-			//provider: '',
-			requestServiceDetail: formData.map((item) => ({
+			items: formData.map((item) => ({
 				id: item.id,
+				priceFinal: parseFloat(item.budget),
 				comment: item.comment,
-				quantity: item.quantity,
-				priceFinal: parseFloat(item.budget.replace(/[^0-9.-]+/g, "")),
-				service: item.serviceId,
 			})),
 		}
 

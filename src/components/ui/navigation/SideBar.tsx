@@ -249,7 +249,7 @@ function SideBar({ open, setOpen }: SideBarProps) {
             <CircularProgress/>
           ) : (
             <List>
-              {items.map((page, index) => (
+              {items.map((page: any, index: number) => (
                 <Fragment key={page.name}>
                   <ListItem disablePadding sx={{ display: "block" }}>
                     {page.children ? (

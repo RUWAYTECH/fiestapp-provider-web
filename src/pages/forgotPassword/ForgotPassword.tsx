@@ -7,7 +7,7 @@ import paths from "@/core/constants/paths";
 import { useForgotPasswordMutation } from "../../stateManagement/apiSlices/userApi";
 import LogoApartment from '@/assets/logoProject.png';
 import useStyles from './ForgotPasword.styles'
-import * as modelConstants from "@/pages/registerUser/model/ConstantsRegister";
+import * as modelConstants from "./model/ConstantsForgot";
 
 const Forgot: React.FC = () => {
     const navigate = useNavigate();
@@ -34,7 +34,7 @@ const Forgot: React.FC = () => {
         setEmailError('');
         forgotPassword(data)
             .unwrap()
-            .then((res: any) => {
+            .then(() => {
                 navigate(paths.RESET)
             })
             .catch((err: any) => {

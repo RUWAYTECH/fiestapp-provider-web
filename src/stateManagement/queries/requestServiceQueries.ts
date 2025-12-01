@@ -1,20 +1,21 @@
+import { RequestStatus } from "@/core/constants/requestStatus";
 import { endpoints as ep } from "../../core/constants";
-import { ApiResponseDto, PaginationDto } from "../models/api-response-dto";
 import { RequestServiceRequestDto, RequestServiceResponseDto } from "../models/request-service/request-service-dto";
+import { PaginatedApiResponse } from "../models/api-response-dto";
 
 export const getRequestMyServicesQuery = {
-	query: ({ page, pageSize, state }: { page: number; pageSize: number; state?: 'Solicitado' | 'En proceso' | 'Atendido' }) => {
-		const path = ep.requestService.getRequestMyServices.replace(':page', page.toString()).replace(':pageSize', pageSize.toString());
+	query: (data: { page: number; pageSize: number; status?: RequestStatus }) => {
+		const path = ep.requestService.getAll;
 
 		return {
 			url: path,
 			method: "GET",
-			params: { ...(state ? { filters: { entityStatus: { $eq: state } } } : {}) },
+			params: data,
 		};
 	},
 	keepUnusedDataFor: 0,
-	transformResponse: (response: ApiResponseDto<{ data: RequestServiceResponseDto[], meta: { pagination: PaginationDto} }>) => response,
-	providesTags: (result?: ApiResponseDto<{ data: RequestServiceResponseDto[] }>) => {
+	transformResponse: (response: PaginatedApiResponse<RequestServiceResponseDto[]>) => response,
+	providesTags: (result?: PaginatedApiResponse<RequestServiceResponseDto[]>) => {
 		return result?.data
 			? [
 				...result.data.map(({ id }) => ({ type: "RequestService" as "RequestService", id })),
@@ -25,12 +26,12 @@ export const getRequestMyServicesQuery = {
 }
 
 export const customUpdateRequestServiceMutation = {
-	query: (data: { id: number; data: RequestServiceRequestDto }) => {
-		const path = ep.requestService.customUpdateRequestService.replace(":id", data.id.toString());
+	query: ({ data, id }: { id: string; data: RequestServiceRequestDto }) => {
+		const path = ep.requestService.respondToRequest.replace(":id", id.toString());
 		return {
 			url: path,
-			method: "PUT",
-			data: { data: data.data },
+			method: "PATCH",
+			data: data,
 		};
 	},
 	invalidatesTags: [{ type: "RequestService" as "RequestService", id: "REQUEST_SERVICE_LIST" }],

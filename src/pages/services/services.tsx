@@ -46,12 +46,13 @@ const Services = () => {
 	}, [pagination])
 
 	// calc total pages, params: total, pageSize
-	const totalPages = (total: number, pageSize: number) => {
+	const totalPages = (total: number | undefined, pageSize: number) => {
 		if (total === 0) return 1
+		if (!total) return 0
 		return Math.ceil(total / pageSize)
 	}
 
-	const handleDeleteService = (serviceId: number) => {
+	const handleDeleteService = (serviceId: string) => {
 		launchInstanceModal(
 			baseModalOptions.confirm({
 				onClickOk: () => {
@@ -71,16 +72,16 @@ const Services = () => {
 		);
 	}
 
-	const handleEditService = (serviceId: number) => {
+	const handleEditService = (serviceId: string) => {
 		getService(serviceId).unwrap().then((res) => {
-			setEditData(res)
+			setEditData(res.data)
 			setShowFormModal(true)
 		}).catch(() => {
 			dispatchNotifyStackError("Error al obtener el servicio")
 		})
 	}
 
-	const handleUpdateService = (id: number, data: ServiceRequestDto) => {
+	const handleUpdateService = (id: string, data: ServiceRequestDto) => {
 		updateService({ id, data }).unwrap().then(() => {
 			setShowFormModal(false)
 			setEditData(null)
@@ -95,14 +96,14 @@ const Services = () => {
 			baseModalOptions.confirm({
 				onClickOk: () => {
 					changeStateService(data.id).unwrap().then(() => {
-						dispatchNotifyStackSuccess(`Servicio ${data.state ? "guardado como borrador" : "publicado"} correctamente`)
+						dispatchNotifyStackSuccess(`Servicio ${data.status ? "guardado como borrador" : "publicado"} correctamente`)
 					}).catch(() => {
 						dispatchNotifyStackError("Error al cambiar el estado del servicio")
 					})
 
 					closeInstanceModal()
 				},
-				title: `Estás seguro de ${data.state ? "guardar como borrador" : "publicar"} el servicio?`,
+				title: `Estás seguro de ${data.status ? "guardar como borrador" : "publicar"} el servicio?`,
 				cancelText: localize("common.no"),
 				subtitle: "",
 				subtitle2: "",
@@ -129,7 +130,7 @@ const Services = () => {
 
       <ServiceList services={res?.data ?? []} isLoading={isLoading} onDelete={handleDeleteService} onEdit={handleEditService} onChangeState={handleChangeState} />
 			{!isLoading && (
-				<Pagination count={totalPages(res?.meta?.pagination.total ?? 0, pagination.pageSize)} page={pagination.page} onChange={(_e, page) => setPagination({ ...pagination, page })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
+				<Pagination count={totalPages(res?.pageOptions.totalRows, pagination.pageSize)} page={pagination.page} onChange={(_e, page) => setPagination({ ...pagination, page })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
 			)}
 
 			<GenericModal

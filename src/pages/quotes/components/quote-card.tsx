@@ -13,13 +13,13 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { formatDateddMMyyyy } from "@/utils/format/formatDates";
 import { RequestServiceResponseDto } from "@/stateManagement/models/request-service/request-service-dto";
-import Config from "@/core/config/config";
+import { RequestStatus } from "@/core/constants/requestStatus";
 
 interface QuoteCardProps {
 	quote: RequestServiceResponseDto;
 	updating?: boolean;
-	isEditable: (status: string) => boolean;
-	onSubmit: (formData: { id: number, budget: string; comment: string; quantity: number; serviceId: number }[]) => void;
+	isEditable: (status: RequestStatus) => boolean;
+	onSubmit: (formData: { id: string, budget: string; comment: string; quantity: number; serviceId: string }[]) => void;
 }
 
 const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSubmit }) => {
@@ -30,20 +30,20 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
-			requestServiceDetails: quote.requestServiceDetails.map((item) => ({
+			requestServiceDetails: quote.items?.map((item) => ({
 				id: item.id,
 				name: item.service.name,
 				priceMin: item.service.priceMin,
 				priceMax: item.service.priceMax,
-				priceFinal: item.priceFinal,
+				priceFinal: item.price,
 				quantity: item.quantity,
-				image: `${Config.baseUrl}${item.service.fileImage?.[0]?.url}`,
+				image: item.service.images?.[0].url,
 				serviceId: item.service.id,
-				budget: item.priceFinal.toFixed(2),
+				budget: item.price.toFixed(2),
 				comment: item.comment,
 			})),
 		},
-		disabled: !isEditable(quote.entityStatus),
+		disabled: !isEditable(quote.status),
 	});
 
 	const { fields } = useFieldArray({
@@ -74,32 +74,33 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 				}}
 			>
 				<Typography variant="caption" color="text.secondary">
-					Recibida: {quote.updatedAt ? formatDateddMMyyyy(quote.updatedAt) : ""}
+					Recibida: {quote.createdAt ? formatDateddMMyyyy(quote.createdAt) : ""}
 				</Typography>
 				<Typography
 					variant="body2"
 					sx={{
 						color:
-							quote.entityStatus === "Solicitado"
+							quote.status === RequestStatus.REQUESTED
 								? theme.palette.success.main
 								: theme.palette.error.main,
 						fontWeight: "bold",
 					}}
 				>
-					{quote.entityStatus}
+					{quote.status}
 				</Typography>
 			</Box>
 			<Typography variant="h6" sx={{ fontWeight: "bold" }}>
-				{quote.message}
+				{quote.comment}
 			</Typography>
 			<Typography>
-				Fecha del evento: {quote.registerDate ? formatDateddMMyyyy(quote.registerDate) : ""}
+				Fecha del evento: {quote.eventDate ? formatDateddMMyyyy(quote.eventDate) : ""}
 			</Typography>
 			<Typography>
-				Servicio: {quote.requestServiceDetails.map((item) => item.service.name).join(", ")}
+				Servicio: {quote.items?.map((item) => item.service.name).join(", ")}
 			</Typography>
-			<Typography>Presupuesto: S/ {quote.approximateBudget.toFixed(2)}</Typography>
-			<Typography>Personas: {quote.numberInvite}</Typography>
+			<Typography>Presupuesto inicial: S/ {quote.budgetAmount?.toFixed(2)}</Typography>
+			<Typography>Precio final: S/ {quote.finalPrice?.toFixed(2)}</Typography>
+			<Typography>Personas: {quote.guestQty}</Typography>
 			<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
 				{isOpen ? (
 					<Button
@@ -113,17 +114,17 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 					<Button
 						variant="outlined"
 						sx={{
-							color: quote.entityStatus === "Solicitado" ? "#fff" : theme.palette.primary.main,
-							backgroundColor: quote.entityStatus === "Solicitado" ? theme.palette.primary.main : "transparent",
+							color: quote.status === RequestStatus.REQUESTED ? "#fff" : theme.palette.primary.main,
+							backgroundColor: quote.status === RequestStatus.REQUESTED ? theme.palette.primary.main : "transparent",
 							borderColor: theme.palette.primary.main,
 							"&:hover": {
-								backgroundColor: quote.entityStatus === "Solicitado" ? theme.palette.primary.dark : theme.palette.primary.light,
+								backgroundColor: quote.status === RequestStatus.REQUESTED ? theme.palette.primary.dark : theme.palette.primary.light,
 								color: "#fff",
 							},
 						}}
 						onClick={() => setIsOpen(!isOpen)}
 					>
-						{quote.entityStatus === "Solicitado" ? "Responder" : "Ver Detalles"}
+						{quote.status === RequestStatus.REQUESTED ? "Responder" : "Ver Detalles"}
 					</Button>
 				)}
 			</Box>
@@ -181,8 +182,8 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 											size="small"
 											placeholder="Ej: 2000.00"
 											sx={{ mb: 2 }}
-											error={!!errors.requestServiceDetails?.[item.id]?.budget}
-											helperText={errors.requestServiceDetails?.[item.id]?.budget?.message}
+											error={!!errors.requestServiceDetails?.[index]?.budget}
+											helperText={errors.requestServiceDetails?.[index]?.budget?.message}
 										/>
 									)}
 								/>
@@ -205,7 +206,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 							</Grid>
 						</Grid>
 					))}
-					{isEditable(quote.entityStatus) && (
+					{isEditable(quote.status) && (
 						<Button
 							variant="contained"
 							color="primary"

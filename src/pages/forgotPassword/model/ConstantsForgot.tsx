@@ -1,6 +1,6 @@
 
-export const EMAIL = 'email';
+export const USER_EMAIL = 'email';
 
 export const initValues = {
-    [EMAIL]: '',
+    [USER_EMAIL]: '',
 };

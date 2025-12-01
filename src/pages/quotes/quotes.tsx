@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import RenderTabs from "./components/render-tabs";
 import { useLazyGetRequestMyServicesQuery } from "@/stateManagement/apiSlices/requestServiceApi";
+import { RequestStatus } from "@/core/constants/requestStatus";
 
 
 const Quotes = () => {
@@ -22,7 +23,7 @@ const Quotes = () => {
 	}
 
 	useEffect(() => {
-		getQuotes({ ...pagination, state: tabIndex === 0 ? undefined : tabIndex === 1 ? 'Solicitado' : 'En proceso' }).unwrap()
+		getQuotes({ ...pagination, status: tabIndex === 0 ? undefined : tabIndex === 1 ? RequestStatus.REQUESTED : RequestStatus.IN_PROGRESS }).unwrap()
 	}, [pagination, tabIndex])
 
 	const totalPages = (total: number, pageSize: number) => {
@@ -70,26 +71,12 @@ const Quotes = () => {
 
 				<Divider sx={{ mb: 2 }} />
 
-				{tabIndex === 0 && (
-					<RenderTabs
-						loading={isLoading}
-						data={res?.data || []}
-					/>
-				)}
-				{tabIndex === 1 && (
-					<RenderTabs
-						loading={isLoading}
-						data={res?.data || []}
-					/>
-				)}
-				{tabIndex === 2 && (
-					<RenderTabs
-						loading={isLoading}
-						data={res?.data || []}
-					/>
-				)}
+				<RenderTabs
+					loading={isLoading}
+					data={res?.data || []}
+				/>
 				{!isLoading && (
-					<Pagination count={totalPages(res?.meta?.pagination.total ?? 0, pagination.pageSize)} page={pagination.page} onChange={(_e, page) => setPagination({ ...pagination, page })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
+					<Pagination count={totalPages(res?.pageOptions.totalRows ?? 0, pagination.pageSize)} page={pagination.page} onChange={(_e, page) => setPagination({ ...pagination, page })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
 				)}
 			</Card>
 		</Box>

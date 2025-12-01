@@ -1,19 +1,21 @@
 import CustomInput from "@/components/ui/input/CustomInput"
 import { Box, Button, Card, Divider, Grid, Typography } from "@mui/material"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { updateProviderConstants } from "./model/constants"
 import localize from "@/utils/localizer"
 import useYupValidationResolver from "@/core/hooks/useYupValidationResolver"
 import * as Yup from "yup"
-import { useLazyGetProviderByUserIdQuery, useUpdateProviderProfileMutation } from "@/stateManagement/apiSlices/providerApi"
 import Auth from "@/core/services/auth/auth"
 import { useEffect } from "react"
 import { ProviderRequestDto } from "@/stateManagement/models/provider/provider-dto"
 import { CircularProgress } from "@mui/material"
 import { dispatchNotifyStackError, dispatchNotifyStackSuccess } from "@/core/services/notistack"
+import { useLazyProfileQuery, useSyncProviderMutation } from "@/stateManagement/apiSlices/userApi"
+import { ProfilePhotoPicker } from "./components/profile-photo-picker"
 
 const schema = Yup.object().shape({
 	[updateProviderConstants.NAME]: Yup.string().required(localize("common.fieldRequired")),
+	[updateProviderConstants.PICTURE]: Yup.string().url().required(localize("common.fieldRequired")),
 	[updateProviderConstants.DESCRIPTION]: Yup.string().required(localize("common.fieldRequired")),
 	[updateProviderConstants.EMAIL]: Yup.string()
 		.email(localize("common.invalidEmail"))
@@ -28,10 +30,10 @@ const schema = Yup.object().shape({
 const UpdateProvider = () => {
 	const resolver = useYupValidationResolver(schema);
 	const userInfo = Auth.getUserInfo()
-	const [ getProviderById, { isLoading: isLoadingGetProviderById } ] = useLazyGetProviderByUserIdQuery()
-	const [ updateProviderProfile, { isLoading: isLoadingUpdate } ] = useUpdateProviderProfileMutation()
+	const [ getProfile, { isLoading: isLoadingProfile } ] = useLazyProfileQuery()
+	const [syncProvider, { isLoading: isLoadingSync }] = useSyncProviderMutation()
 
-	const { handleSubmit, control, setValue, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
+	const { handleSubmit, control, setValue, watch, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
 		defaultValues: {
 			name: "",
 			description: "",
@@ -43,7 +45,7 @@ const UpdateProvider = () => {
 			instagram: "",
 		},
 		resolver,
-		disabled: isLoadingGetProviderById,
+		disabled: isLoadingProfile,
 	})
 
 	const handleSubmitForm = (data: Yup.InferType<typeof schema>) => {
@@ -55,15 +57,15 @@ const UpdateProvider = () => {
 			email: data.email ?? '',
 			phone: data.phone ?? '',
 			address: data.address ?? '',
-			website: data.website,
-			facebookUrl: data.facebook,
-			instagramUrl: data.instagram,
+			website: data.website ?? '',
+			facebook: data.facebook ?? '',
+			instagram: data.instagram ?? '',
+			picture: data.picture ?? '',
+			status: true
 		}
 
-		updateProviderProfile(newData).unwrap().then((response) => {
-			if (response.data) {
-				dispatchNotifyStackSuccess('Datos actualizados correctamente')
-			}
+		syncProvider(newData).unwrap().then(() => {
+			dispatchNotifyStackSuccess('Datos actualizados correctamente')
 		}).catch(() => {
 			dispatchNotifyStackError('Error al actualizar datos')
 		})
@@ -71,17 +73,17 @@ const UpdateProvider = () => {
 
 	useEffect(() => {
 		if (userInfo.id) {
-			getProviderById(userInfo.id).unwrap().then((response) => {
-				const provider = response?.data?.[0]
-				if (provider) {
-					setValue(updateProviderConstants.NAME, provider.name)
-					setValue(updateProviderConstants.DESCRIPTION, provider.description ?? "")
-					setValue(updateProviderConstants.EMAIL, provider.email)
-					setValue(updateProviderConstants.PHONE, provider.phone ?? "")
-					setValue(updateProviderConstants.ADDRESS, provider.address)
-					setValue(updateProviderConstants.WEBSITE, provider.website ?? "")
-					setValue(updateProviderConstants.FACEBOOK, provider.facebookUrl ?? "")
-					setValue(updateProviderConstants.INSTAGRAM, provider.instagramUrl ?? "")
+			getProfile(undefined).unwrap().then((res) => {
+				if (res.data.provider) {
+					setValue(updateProviderConstants.PICTURE, res.data.provider.picture)
+					setValue(updateProviderConstants.NAME, res.data.provider.name)
+					setValue(updateProviderConstants.DESCRIPTION, res.data.provider.description ?? "")
+					setValue(updateProviderConstants.EMAIL, res.data.provider.email)
+					setValue(updateProviderConstants.PHONE, res.data.provider.phone ?? "")
+					setValue(updateProviderConstants.ADDRESS, res.data.provider.address)
+					setValue(updateProviderConstants.WEBSITE, res.data.provider.website ?? "")
+					setValue(updateProviderConstants.FACEBOOK, res.data.provider.facebook ?? "")
+					setValue(updateProviderConstants.INSTAGRAM, res.data.provider.instagram ?? "")
 				}
 			})
 		}
@@ -102,6 +104,19 @@ const UpdateProvider = () => {
 				>
 					<Typography variant="h6">{localize("updateProvider.title")}</Typography>
 				</Box>
+
+				<Controller
+					name={updateProviderConstants.PICTURE}
+					control={control}
+					render={({ field }) => (
+						<ProfilePhotoPicker
+							currentImage={field.value}
+							fallbackText={watch(updateProviderConstants.NAME) || "PP"}
+							onImageChange={(url) => field.onChange(url)}
+							size="lg"
+						/>
+					)}
+				/>
 
 				<Divider sx={{ mb: 2 }} />
 
@@ -192,8 +207,8 @@ const UpdateProvider = () => {
 							variant="contained"
 							color="primary"
 							size="large"
-							disabled={isLoadingUpdate}
-							startIcon={isLoadingUpdate ? <CircularProgress size={20} /> : null}
+							disabled={isLoadingSync}
+							startIcon={isLoadingSync ? <CircularProgress size={20} /> : null}
 						>
 							{localize("updateProvider.submit")}
 						</Button>

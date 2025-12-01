@@ -2,7 +2,6 @@ import logo from "@/assets/logo.png";
 import Apartment from "@/assets/portada.jpg";
 import CustomInput from "@/components/ui/input/CustomInput";
 import useYupValidationResolver from "@/core/hooks/useYupValidationResolver";
-import GoogleIcon from '@mui/icons-material/Google';
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
@@ -17,7 +16,7 @@ import {
 	Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -28,10 +27,9 @@ import {
 	dispatchNotifyStack,
 } from "../../core/services/notistack";
 import {
-	useLazyGoogleLoginQuery,
+	useGoogleLoginMutation,
 	useLoginMutation,
-} from "../../stateManagement/apiSlices/userApi";
-import { userDto } from "../../stateManagement/models";
+} from "../../stateManagement/apiSlices/userApi";;
 import localize from "../../utils/localizer";
 import useStyles from "./Login.styles";
 import * as userConstants from "./model/LoginConstants";
@@ -52,22 +50,22 @@ const Login: React.FC = () => {
 	const [showPassword, setShowPassword] = useState(false);
 
   const [login, { isLoading }] = useLoginMutation();
-	const [googleLogin, { isLoading: loadingGoogleLogin }] = useLazyGoogleLoginQuery();
+	const [googleLogin] = useGoogleLoginMutation();
 
-  const { handleSubmit, control, formState: { errors } } = useForm<userDto>({
-		defaultValues: { identifier: '', password: '' },
+  const { handleSubmit, control, formState: { errors } } = useForm<{ email: string; password: string }>({
+		defaultValues: { email: '', password: '' },
     resolver,
   });
 
-	const loginGoogle = useGoogleLogin({
+	/* const loginGoogle = useGoogleLogin({
 		onSuccess: (credentialResponse) => {
 			if (!credentialResponse?.access_token) return;
 
-			googleLogin({ credential: credentialResponse.access_token })
+			googleLogin(credentialResponse.access_token)
 				.unwrap()
 				.then((res) => {
-					Auth.setUserToken(res.jwt);
-					Auth.setUserInfo(res.user);
+					Auth.setUserToken(res.data.token);
+					Auth.setUserInfo(res.data.user);
 					navigate(paths.DASHBOARD);
 				})
 				.catch(() => {
@@ -77,15 +75,15 @@ const Login: React.FC = () => {
 		onError: () => {
 			dispatchNotifyStack({ message: localize("login.error") }, httpStatusCodes.BAD_REQUEST);
 		}
-	});
+	}); */
 
-  const handleSubmitForm = (data: userDto) => {
+  const handleSubmitForm = (data: { email: string; password: string }) => {
     Auth.logout();
     login(data)
       .unwrap()
       .then((res) => {
-        Auth.setUserToken(res.jwt);
-				Auth.setUserInfo(res.user);
+        Auth.setUserToken(res.data.token);
+				Auth.setUserInfo(res.data.user);
 				navigate(paths.DASHBOARD);
       })
       .catch(() => {
@@ -95,6 +93,20 @@ const Login: React.FC = () => {
 
   const handleShowPassword = () => setShowPassword((show) => !show);
   const handleRegister = () => navigate(paths.REGISTER);
+
+	const handleProviderSignIn = (token: string | undefined) => {
+		if (!token) return;
+		googleLogin(token)
+			.unwrap()
+			.then((res) => {
+				Auth.setUserToken(res.data.token);
+				Auth.setUserInfo(res.data.user);
+				navigate(paths.DASHBOARD);
+			})
+			.catch(() => {
+				dispatchNotifyStack({ message: localize("login.error") }, httpStatusCodes.BAD_REQUEST);
+			});
+	};
 
   return (
     <Box>
@@ -132,7 +144,7 @@ const Login: React.FC = () => {
             </Typography>
             <Box sx={{ width: "100%", maxWidth: "400px" }}>
 							<Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-								<Button
+								{/* <Button
 									variant="outlined"
 									fullWidth
 									size="large"
@@ -159,7 +171,8 @@ const Login: React.FC = () => {
 									}}
 								>
 									Continuar con Google
-								</Button>
+								</Button> */}
+								<GoogleLogin onSuccess={res => handleProviderSignIn(res.credential)} onError={() => dispatchNotifyStack({ message: localize("login.error") }, httpStatusCodes.BAD_REQUEST)} />
 							</Box>
 							<Box sx={{ textAlign: "center", mt: 2 }}>
 								<Typography variant="body2" sx={{ color: "text.secondary" }}>

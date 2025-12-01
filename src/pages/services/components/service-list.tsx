@@ -8,8 +8,8 @@ import ChangeStateIcon from "@mui/icons-material/ChangeCircle"
 interface ServiceListProps {
   services: ServiceResponseDto[]
 	isLoading?: boolean
-	onEdit?: (serviceId: number) => void
-	onDelete?: (serviceId: number) => void
+	onEdit?: (serviceId: string) => void
+	onDelete?: (serviceId: string) => void
 	onChangeState?: (data: ServiceResponseDto) => void
 }
 
@@ -59,11 +59,11 @@ export function ServiceList({ services, isLoading, onEdit, onDelete, onChangeSta
 									{service.description}
 								</Typography>
 								<Chip
-									label={service.state ? "Publicado" : "Borrador"}
+									label={service.status ? "Publicado" : "Borrador"}
 									size="small"
 									sx={{
-										bgcolor: service.state ? "rgba(46, 204, 113, 0.1)" : "rgba(255, 99, 132, 0.1)",
-										color: service.state ? "#2ecc71" : "#ff6384",
+										bgcolor: service.status ? "rgba(46, 204, 113, 0.1)" : "rgba(255, 99, 132, 0.1)",
+										color: service.status ? "#2ecc71" : "#ff6384",
 										fontWeight: "medium",
 										borderRadius: "4px",
 										marginLeft: 2,

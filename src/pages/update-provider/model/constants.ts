@@ -1,5 +1,6 @@
 export const updateProviderConstants = {
 	NAME: "name",
+	PICTURE: "picture",
 	DESCRIPTION: "description",
 	EMAIL: "email",
 	PHONE: "phone",

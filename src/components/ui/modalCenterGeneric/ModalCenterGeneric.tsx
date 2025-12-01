@@ -94,7 +94,7 @@ ModalCenterGeneric.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   icon: PropTypes.element,
   ModalProps: PropTypes.object,
-  children: PropTypes.node,
+  children: PropTypes.node as unknown as React.Validator<React.ReactNode>,
 };
 
 export default ModalCenterGeneric;

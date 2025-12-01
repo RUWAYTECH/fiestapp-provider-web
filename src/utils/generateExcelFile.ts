@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+/* import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 const generateExcelFile = async (headers: string[], columnNames: string[] , data: any, fileName: string) => {
@@ -33,4 +33,4 @@ const generateExcelFile = async (headers: string[], columnNames: string[] , data
     saveAs(excelBlob, `${fileName}.xlsx`);
 };
 
-export default generateExcelFile;
+export default generateExcelFile; */

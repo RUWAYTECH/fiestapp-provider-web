@@ -1,6 +1,6 @@
-import { ApiResponseDto } from "../models/api-response-dto";
 import { CategoryResponseDto } from "../models/category/category-dto";
 import { endpoints as ep } from "../../core/constants";
+import { ApiResponse } from "../models/api-response-dto";
 
 export const getCategoriesQuery = {
 	query: () => {
@@ -11,5 +11,5 @@ export const getCategoriesQuery = {
 		};
 	},
 	keepUnusedDataFor: 0,
-	transformResponse: (response: ApiResponseDto<{ data: CategoryResponseDto[] }>) => response.data,
+	transformResponse: (response: ApiResponse<CategoryResponseDto[]>) => response.data,
 };

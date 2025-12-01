@@ -10,10 +10,10 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 const schema = Yup.object().shape({
 	currentPassword: Yup.string().required(localize("common.fieldRequired")),
-	password: Yup.string().required(localize("common.fieldRequired")),
+	newPassword: Yup.string().required(localize("common.fieldRequired")),
 	passwordConfirmation: Yup.string()
 		.required(localize("common.fieldRequired"))
-		.oneOf([Yup.ref('password'), ''], localize("common.passwordsMustMatch")),
+		.oneOf([Yup.ref('newPassword'), ''], localize("common.passwordsMustMatch")),
 })
 
 const ChangePassword = ({ disabled }: { disabled?: boolean }) => {
@@ -23,7 +23,7 @@ const ChangePassword = ({ disabled }: { disabled?: boolean }) => {
 	const { handleSubmit, control, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
 		defaultValues: {
 			currentPassword: "",
-			password: "",
+			newPassword: "",
 			passwordConfirmation: "",
 		},
 		resolver,
@@ -52,12 +52,12 @@ const ChangePassword = ({ disabled }: { disabled?: boolean }) => {
 				errorText={errors.currentPassword ? errors.currentPassword.message : ""}
 			/>
 			<CustomInput
-				id="password"
+				id="newPassword"
 				control={control}
 				label={localize("profile.newPassword")}
 				type="password"
-				error={!!errors.password}
-				errorText={errors.password ? errors.password.message : ""}
+				error={!!errors.newPassword}
+				errorText={errors.newPassword ? errors.newPassword.message : ""}
 			/>
 			<CustomInput
 				id="passwordConfirmation"

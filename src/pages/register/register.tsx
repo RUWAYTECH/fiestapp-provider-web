@@ -50,7 +50,7 @@ const Register: React.FC = () => {
   const [register, { isLoading }] = useRegisterMutation();
 
   const { handleSubmit, control, formState: { errors } } = useForm<RegisterRequestDto & { confirmPassword: string }>({
-    defaultValues: { username: '', email: '', password: '', confirmPassword: '' },
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
     resolver,
   });
 
@@ -60,8 +60,8 @@ const Register: React.FC = () => {
     register({ ...rest })
       .unwrap()
       .then((res) => {
-        Auth.setUserToken(res.jwt);
-        Auth.setUserInfo(res.user);
+        Auth.setUserToken(res.data.token);
+        Auth.setUserInfo(res.data.user);
         navigate(paths.DASHBOARD);
       })
       .catch(() => {

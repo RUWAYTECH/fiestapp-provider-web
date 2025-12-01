@@ -3,7 +3,7 @@ import CustomInput from '@/components/ui/input/CustomInput'
 import SelectTextField from '@/components/ui/selectTextField/SelectTextField'
 import useYupValidationResolver from '@/core/hooks/useYupValidationResolver'
 import localize from '@/utils/localizer'
-import { Box, Button, FormHelperText, Grid } from '@mui/material'
+import { Box, Button, Grid } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 import UploadImage, { ImageFile } from './upload-images'
@@ -11,9 +11,9 @@ import { useGetCategoriesQuery } from '@/stateManagement/apiSlices/categoryApi'
 import { useGetUbigeosQuery } from '@/stateManagement/apiSlices/ubigeoApi'
 import { ServiceRequestDto, ServiceResponseDto } from '@/stateManagement/models/service/service-dto'
 import { useEffect, useState } from 'react'
-import { useUploadMutation } from '@/stateManagement/apiSlices/uploadApi'
-import { v4 as uuidv4 } from 'uuid'
 import Config from '@/core/config/config'
+import axios from 'axios'
+import { dispatchNotifyStackError, dispatchNotifyStackSuccess } from '@/core/services/notistack'
 
 const schema = Yup.object().shape({
 	name: Yup.string().required(localize("common.fieldRequired")),
@@ -22,10 +22,10 @@ const schema = Yup.object().shape({
 	minPrice: Yup.number().required(localize("common.fieldRequired")),
 	maxPrice: Yup.number().required(localize("common.fieldRequired")),
 	serviceZone: Yup.array().of(Yup.object().shape({
-		value: Yup.number().required(localize("common.fieldRequired")),
+		value: Yup.string().required(localize("common.fieldRequired")),
 		label: Yup.string().required(localize("common.fieldRequired")),
 	})).min(1, localize("common.fieldRequired")).required(localize("common.fieldRequired")),
-	attachments: Yup.array().of(Yup.string().required(localize("common.fieldRequired"))).min(1, localize("common.fieldRequired")).required(localize("common.fieldRequired")),
+	// attachments: Yup.array().of(Yup.string().required(localize("common.fieldRequired"))).min(1, localize("common.fieldRequired")).required(localize("common.fieldRequired")),
 })
 
 interface ServiceFormProps {
@@ -37,69 +37,105 @@ interface ServiceFormProps {
 
 const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoading }) => {
 	const resolver = useYupValidationResolver(schema)
-	const [uploadedFiles, setUploadedFiles] =  useState<ImageFile[]>([])
+	const [uploadedFiles, setUploadedFiles] = useState<ImageFile[]>([])
 
 	const { handleSubmit, control, setValue, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
 		defaultValues: {
 			name: "",
 			category: "",
 			description: "",
-			minPrice: 0,
-			maxPrice: 0,
+			minPrice: "",
+			maxPrice: "",
 			serviceZone: [],
-			attachments: [],
-		},
+		} as unknown as Yup.InferType<typeof schema>,
 		resolver,
 	})
 
 	const { data: categories, isLoading: loadingCategories } = useGetCategoriesQuery(undefined)
 	const { data: ubigeos, isLoading: loadingUbigeos } = useGetUbigeosQuery(undefined)
-	const [uploadFile] = useUploadMutation()
 
 	const handleFormSubmit = (data: Yup.InferType<typeof schema>) => {
+		if (uploadedFiles.filter(file => file.state === 'success').length === 0) {
+			dispatchNotifyStackError('Debe subir al menos una imagen del servicio');
+			return;
+		}
+
 		onSave({
 			name: data.name,
 			description: data.description,
 			priceMin: data.minPrice,
 			priceMax: data.maxPrice,
-			category: data.category,
-			ubigeos: data.serviceZone.map((item) => item.value),
-			fileImage: data.attachments,
-			score: 5
+			categoryId: data.category,
+			ubigeoIds: data.serviceZone.map((item) => item.value),
+			imageUrls: uploadedFiles.filter(file => file.state === 'success').map(file => file.url),
+			status: true
 		})
 	}
 
-	const handleUploadFile = (file: File) => {
-		const formData = new FormData()
+	const handleUploadFile = (selectedFile: File) => {
+		if (selectedFile) {
+			const id = uploadedFiles.length > 0 ? uploadedFiles.length + 1 : 1;
 
-		formData.append("files", file)
+			setUploadedFiles(prevFiles => {
+				const newFile: ImageFile = {
+					id,
+					name: selectedFile.name,
+					url: URL.createObjectURL(selectedFile),
+					state: 'loading',
+				};
 
-		const uploadingFile: ImageFile = {
-			id: uuidv4(),
-			name: file.name,
-			url: URL.createObjectURL(file),
-			state: "loading",
+				return [...prevFiles, newFile];
+			});
+
+			const formData = new FormData();
+			formData.append('file', selectedFile);
+			formData.append('upload_preset', Config.cloudinaryPreset);
+			console.log('Uploading file to Cloudinary:', selectedFile, Config.cloudinaryUrl, Config.cloudinaryPreset);
+			axios({
+				url: Config.cloudinaryUrl,
+				method: 'POST',
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				},
+				data: formData
+			})
+				.then(res => {
+					// setValue('attachments', [...getValues('attachments'), res.data.secure_url]);
+					setUploadedFiles(prevFiles => {
+						return prevFiles.map(file => {
+							if (file.id === id) {
+								return {
+									...file,
+									url: res.data.secure_url,
+									state: 'success',
+								};
+							}
+							return file;
+						});
+					});
+
+					dispatchNotifyStackSuccess('Imagen subida con éxito');
+				})
+				.catch(err => {
+					setUploadedFiles(prevFiles => {
+						return prevFiles.map(file => {
+							if (file.id === id) {
+								return {
+									...file,
+									state: 'error',
+								};
+							}
+							return file;
+						});
+					});
+
+					dispatchNotifyStackError(err.response?.data?.error?.message || err.message);
+				});
 		}
-
-		setUploadedFiles((prev) => [...prev, uploadingFile])
-
-		uploadFile(formData).unwrap().then((response) => {
-			const newFile: ImageFile = {
-				id: response[0].id,
-				name: file.name,
-				url: Config.baseUrl + response[0].url,
-				state: "success",
-			}
-			setUploadedFiles((prev) => prev.map((item) => (item.id === uploadingFile.id ? newFile : item)))
-			setValue("attachments", [...uploadedFiles.map(item => item.id.toString()), newFile.id.toString()])
-		}).catch(() => {
-			setUploadedFiles((prev) => prev.map((item) => (item.id === uploadingFile.id ? { ...item, state: "error" } : item)))
-		})
 	}
 
 	const handleDeleteFile = (fileId: string | number) => {
-		setUploadedFiles((prev) => prev.filter((item) => item.id !== fileId))
-		setValue("attachments", uploadedFiles.filter(item => item.id !== fileId).map(item => item.id.toString()))
+		setUploadedFiles(prevFiles => prevFiles.filter(f => f.id !== fileId));
 	}
 
 	useEffect(() => {
@@ -108,18 +144,17 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoa
 			setValue("description", data.description)
 			setValue("minPrice", data.priceMin)
 			setValue("maxPrice", data.priceMax)
-			setValue("category", data.category ? data.category.id.toString() : "")
-			setValue("serviceZone", data.ubigeoServices?.map((item) => ({
-				label: `${item.ubigeo?.department} - ${item.ubigeo?.province} - ${item.ubigeo?.district}`,
-				value: item.ubigeo?.id,
+			setValue("category", data.categoryId ? data.categoryId.toString() : "")
+			setValue("serviceZone", data.ubigeos?.map((ubigeo) => ({
+				label: `${ubigeo.department} - ${ubigeo.province} - ${ubigeo.district}`,
+				value: ubigeo.id,
 			})) || [])
-			setValue("attachments", data.fileImage?.map((item) => item.id.toString()) || [])
-			setUploadedFiles(data.fileImage?.map((item) => ({
-				id: item.id,
-				name: item.name,
-				url: Config.baseUrl + item.url,
-				state: "success",
-			})) || [])
+			setUploadedFiles(data.images.map((url, index) => ({
+				id: index + 1,
+				name: `Image ${index + 1}`,
+				url,
+				state: 'success'
+			})))
 		}
 	}, [data])
 
@@ -224,11 +259,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoa
 				</Box>
 				<Box sx={{ mt: 1.5 }}>
 					<UploadImage uploadFile={handleUploadFile} uploadedFiles={uploadedFiles} deleteFile={handleDeleteFile} />
-					{errors.attachments && (
+					{/* {errors.attachments && (
 						<FormHelperText error sx={{ mt: 1 }}>
 							{errors.attachments?.message}
 						</FormHelperText>
-					)}
+					)} */}
 				</Box>
 				<Box sx={{ display: "flex", justifyContent: "end", mt: 2 }}>
 					<Button

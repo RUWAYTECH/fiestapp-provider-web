@@ -5,10 +5,10 @@ import { useTheme } from '@mui/material/styles';
 
 /* import useStyles from './GenericModalAlert.styles' */
 
-const isJsxElement = (element: any, fallback = (arg: any) => null) => {
-  
+const isJsxElement = (element: any, fallback = (_arg: any) => null) => {
+
   if (React.isValidElement(element)) return element
-  
+
   return fallback(element)
 }
 
@@ -52,7 +52,7 @@ const GenericModalAlert: React.FC<any> = ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        
+
       }}>
         <div style={{
           textAlign: 'center',
@@ -61,7 +61,7 @@ const GenericModalAlert: React.FC<any> = ({
           justifyItems: 'center',
           width: '100%',
           height: '100%',
-          
+
         }}>
           {icon && <div>{icon}</div>}
           {title && <div>
@@ -74,7 +74,7 @@ const GenericModalAlert: React.FC<any> = ({
           )}
           {description && (
             <div>
-              {isJsxElement((description: any, el: any) => (
+              {isJsxElement((_description: any, el: any) => (
                 <Typography align="left" >{el}</Typography>
               ))}
             </div>
@@ -110,7 +110,7 @@ const GenericModalAlert: React.FC<any> = ({
                     fullWidth
                     onClick={onClickOk}
                     variant="contained"
-                    size="large"                    
+                    size="large"
                     startIcon={
                       isLoading ? (
                         <CircularProgress size={20} color="inherit" />

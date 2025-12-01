@@ -1,5 +1,5 @@
 import { endpoints as ep } from "../../core/constants";
-import { ApiResponseDto } from "../models/api-response-dto";
+import { ApiResponse } from "../models/api-response-dto";
 import { UploadFileResponseDto } from "../models/upload/upload-file-dto";
 
 export const uploadMutation = {
@@ -14,5 +14,5 @@ export const uploadMutation = {
 			},
 		};
 	},
-	transformResponse: (response: ApiResponseDto<UploadFileResponseDto[]>) => response,
+	transformResponse: (response: ApiResponse<UploadFileResponseDto[]>) => response,
 };

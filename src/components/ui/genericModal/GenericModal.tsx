@@ -6,10 +6,10 @@ import { useMediaQuery } from '@mui/material';
 
 /* import useStyles from './GenericModal.styles' */
 
-const isJsxElement = (element: any, fallback = (arg: any) => null) => {
-  
+const isJsxElement = (element: any, fallback = (_arg: any) => null) => {
+
   if (React.isValidElement(element)) return element
-  
+
   return fallback(element)
 }
 
@@ -77,7 +77,7 @@ const GenericModal: React.FC<any> = ({
           )}
           {description && (
             <div>
-              {isJsxElement((description: any, el: any) => (
+              {isJsxElement((_description: any, el: any) => (
                 <Typography align="left" >{el}</Typography>
               ))}
             </div>
@@ -125,7 +125,7 @@ const GenericModal: React.FC<any> = ({
                       {
                         backgroundColor: 'primary.main',
                         color: '#fff',
-                        
+
                         fontSize: 16,
                         width: 187,
                         height:50,

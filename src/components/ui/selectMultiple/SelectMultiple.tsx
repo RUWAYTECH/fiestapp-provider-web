@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
@@ -61,7 +61,7 @@ const SelectMultiple = forwardRef<HTMLDivElement, SelectMultipleProps>(
     },
     ref
   ) => {
-    
+
     const isMediumScreen = useMediaQuery("(min-width: 960px)");
     const isMobileLScreen = useMediaQuery("(min-width: 425px)");
     const isMobileMScreen = useMediaQuery("(min-width: 375px)");
@@ -69,7 +69,7 @@ const SelectMultiple = forwardRef<HTMLDivElement, SelectMultipleProps>(
 
     useEffect(() => {
       let selectedValues = [];
-    
+
       if (Array.isArray(value)) {
         selectedValues = value;
       } else if (typeof value === 'string') {
@@ -79,11 +79,11 @@ const SelectMultiple = forwardRef<HTMLDivElement, SelectMultipleProps>(
           selectedValues = [value];
         }
       }
-    
+
       if (JSON.stringify(selectedValues) !== JSON.stringify(personName)) {
         handleChange(selectedValues);
       }
-    
+
       if ((!value || value.length === 0) && JSON.stringify(personName) !== "[]") {
         handleChange([]);
       }
@@ -93,8 +93,8 @@ const SelectMultiple = forwardRef<HTMLDivElement, SelectMultipleProps>(
       if (Array.isArray(data) && data?.length === 1 && Number(data[0]) === 0) {
         return;
       }
-      setPersonName(Array.isArray(data) ? data : [data]);    
-      onChange(data);      
+      setPersonName(Array.isArray(data) ? data : [data]);
+      onChange(data);
       onSelectItem(data);
     };
 
@@ -150,7 +150,7 @@ const SelectMultiple = forwardRef<HTMLDivElement, SelectMultipleProps>(
             {options?.map((item) => (
               <MenuItem key={item.value} value={item.value}>
                 <Checkbox
-                  checked={personName?.indexOf(item.value) > -1}                 
+                  checked={personName?.indexOf(item.value) > -1}
                 />
                 <ListItemText primary={item.label} />
               </MenuItem>

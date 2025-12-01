@@ -18,7 +18,7 @@ interface DatePickerFieldProps {
     minDate?: Date | null;
     maxDate?: Date | null;
 }
-const DatePickerField: React.ForwardRefRenderFunction<any, DatePickerFieldProps> = (props, ref) => {
+const DatePickerField: React.ForwardRefRenderFunction<any, DatePickerFieldProps> = (props) => {
     const getFormat = (views: Array<'year' | 'month' | 'day'> | undefined) => {
         if (!views) return "DD/MM/YYYY";
         if (views.includes('day')) return 'DD/MM/YYYY';

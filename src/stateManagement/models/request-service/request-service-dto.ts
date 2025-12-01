@@ -1,4 +1,9 @@
+import { RequestStatus } from "@/core/constants/requestStatus";
+import { ProviderResponseDto } from "../provider/provider-dto";
 import { ServiceResponseDto } from "../service/service-dto";
+import { User } from "../user/userDto";
+import { RequestPaymentDto } from "./request-payment.dto";
+import { RequestItemDto } from "./request-item.dto";
 
 export interface RequestServiceDetailResponseDto {
   id: number;
@@ -14,37 +19,24 @@ export interface RequestServiceDetailResponseDto {
 }
 
 export interface RequestServiceResponseDto {
-  id: number;
-  documentId: string;
-  message: string;
-  totalPrice: number;
-  registerDate: string;
-  entityStatus: 'Solicitado' | 'En proceso' | 'Atendido';
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  locale: string | null;
-  numberInvite: number;
-  approximateBudget: number;
-  totalPriceFinal: number | null;
-  requestServiceDetails: RequestServiceDetailResponseDto[];
-}
-
-export interface RequestServiceDetailRequestDto {
-  id: number;
-  comment: string;
-  quantity: number;
-  priceFinal: number;
-  service: number;
+  id: string;
+	guestQty: number;
+	budgetAmount: number;
+	eventDate: string;
+	comment: string;
+	user: User;
+	provider: ProviderResponseDto;
+	status: RequestStatus;
+	finalPrice: number | null;
+	createdAt: string;
+	payment: RequestPaymentDto | null;
+	items: RequestItemDto[];
 }
 
 export interface RequestServiceRequestDto {
-  message: string;
-  totalPrice: number;
-  registerDate: string;
-  entityStatus: 'Solicitado' | 'En proceso' | 'Atendido';
-  provider?: string;
-  numberInvite: number;
-  approximateBudget: number;
-  requestServiceDetail: RequestServiceDetailRequestDto[];
+  items: {
+		id: string;
+		priceFinal: number;
+		comment: string;
+	}[];
 }

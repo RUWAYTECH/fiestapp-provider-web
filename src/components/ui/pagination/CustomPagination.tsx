@@ -19,8 +19,8 @@ const CustomPagination: React.FC<PaginationTypes> = ({meta, handleChangeValue, q
 
   const paginationStyle = useStyles();
   const [paginationValue, setPaginationValue] = useState(paginationValues);
-  
-  const handleChange = (event: React.ChangeEvent<unknown>, value:number) => {
+
+  const handleChange = (_event: React.ChangeEvent<unknown>, value:number) => {
     setPaginationValue({...paginationValue,page: value})
     handleChangeValue({...paginationValue,page: value})
   };
@@ -29,7 +29,7 @@ const CustomPagination: React.FC<PaginationTypes> = ({meta, handleChangeValue, q
     setPaginationValue({...paginationValue, pageSize: event.target.value as string});
     handleChangeValue({...paginationValue, pageSize: event.target.value as string})
   };
-  
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
