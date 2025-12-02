@@ -22,7 +22,7 @@ const schema = Yup.object({
 export default function GroupFilter({ onChange, isLoading, onAdd }: GroupFilterProps) {
 	const resolver = useYupValidationResolver(schema);
 
-	const { control, handleSubmit } = useForm<{ search: string }>({
+	const { control, handleSubmit, setValue } = useForm<{ search: string }>({
 		resolver,
 		defaultValues: {
 			search: ''
@@ -77,6 +77,10 @@ export default function GroupFilter({ onChange, isLoading, onAdd }: GroupFilterP
 						variant="outlined"
 						color="secondary"
 						startIcon={<CleaningServicesIcon />}
+						onClick={() => {
+							setValue('search', '');
+							onChange?.({ search: '' });
+						}}
 					>
 						{localize('common.clear')}
 					</Button>
