@@ -1,5 +1,5 @@
 import CustomInput from "@/components/ui/input/CustomInput"
-import { Box, Button, Card, Divider, Grid, Typography } from "@mui/material"
+import { Box, Button, Card, Divider, FormHelperText, Grid, Typography } from "@mui/material"
 import { Controller, useForm } from "react-hook-form"
 import { updateProviderConstants } from "./model/constants"
 import localize from "@/utils/localizer"
@@ -15,7 +15,7 @@ import { ProfilePhotoPicker } from "./components/profile-photo-picker"
 
 const schema = Yup.object().shape({
 	[updateProviderConstants.NAME]: Yup.string().required(localize("common.fieldRequired")),
-	[updateProviderConstants.PICTURE]: Yup.string().url().required(localize("common.fieldRequired")),
+	[updateProviderConstants.PICTURE]: Yup.string().url().required(localize("common.fieldRequired")).optional().nullable(),
 	[updateProviderConstants.DESCRIPTION]: Yup.string().required(localize("common.fieldRequired")),
 	[updateProviderConstants.EMAIL]: Yup.string()
 		.email(localize("common.invalidEmail"))
@@ -36,6 +36,7 @@ const UpdateProvider = () => {
 	const { handleSubmit, control, setValue, watch, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
 		defaultValues: {
 			name: "",
+			picture: null,
 			description: "",
 			email: "",
 			phone: "",
@@ -109,12 +110,19 @@ const UpdateProvider = () => {
 					name={updateProviderConstants.PICTURE}
 					control={control}
 					render={({ field }) => (
-						<ProfilePhotoPicker
-							currentImage={field.value}
-							fallbackText={watch(updateProviderConstants.NAME) || "PP"}
-							onImageChange={(url) => field.onChange(url)}
-							size="lg"
-						/>
+						<>
+							<ProfilePhotoPicker
+								currentImage={field.value}
+								fallbackText={watch(updateProviderConstants.NAME) || "PP"}
+								onImageChange={(url) => field.onChange(url)}
+								size="lg"
+							/>
+							{errors[updateProviderConstants.PICTURE] && (
+								<FormHelperText error sx={{ mt: 1, textAlign: "center" }}>
+									{errors[updateProviderConstants.PICTURE]?.message}
+								</FormHelperText>
+							)}
+						</>
 					)}
 				/>
 
