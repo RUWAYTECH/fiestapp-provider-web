@@ -60,6 +60,9 @@
 	"common.invalidEmail": "Correo inválido",
 	"common.invalidUrl": "URL inválida",
 	"common.passwordsMustMatch": "Las contraseñas no coinciden",
+	"common.created": "Registro agregado con éxito",
+	"common.updated": "Registro actualizado con éxito",
+	"common.deleted": "Registro eliminado con éxito",
   "requiredEmail": "Ingrese un correo válido",
   "requiredInput": "Campo obligatorio",
   "modal.confirmTitle":"Desea eliminar",
@@ -158,10 +161,12 @@
 	"service.images": "Fotos del servicio",
 	"service.category": "Categoría",
 
+	"category.title": "Categorías",
 	"category.newTitle": "Nueva Categoría",
 	"category.editTitle": "Editar Categoría",
 	"category.name": "Nombre",
 	"category.description": "Descripción",
+	"category.image": "Imagen",
 
   "":""
 }

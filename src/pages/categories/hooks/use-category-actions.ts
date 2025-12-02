@@ -79,7 +79,7 @@ export const useCategoryActions = () => {
 					remove(id)
 						.unwrap()
 						.then(() => {
-							dispatchNotifyStackSuccess(localize('common.ConfirmDelete'));
+							dispatchNotifyStackSuccess(localize('common.deleted'));
 						})
 						.catch(error => {
 							dispatchNotifyStackError(error?.data?.messages?.[0]?.message || 'Ocurrió un error inesperado');

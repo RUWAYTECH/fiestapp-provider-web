@@ -42,7 +42,7 @@ export default function Category() {
 						onEdit={findById}
 						onDelete={deleteItem}
 					/>
-					<Pagination count={totalPages(res?.pageOptions.totalRows, res?.pageOptions.pageSize || paginationValues.pageSize)} page={res?.pageOptions.page || 1} onChange={(_e, page) => handlePaginationChange({ pageNumber: page, pageSize: res?.pageOptions.pageSize || paginationValues.pageSize })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
+					<Pagination count={totalPages(res?.pageOptions.totalRows, Number(res?.pageOptions.pageSize) || paginationValues.pageSize)} page={Number(res?.pageOptions.page) || 1} onChange={(_e, page) => handlePaginationChange({ pageNumber: page, pageSize: res?.pageOptions.pageSize || paginationValues.pageSize })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
 				</Card>
 			</Container>
 			<GenericModal
