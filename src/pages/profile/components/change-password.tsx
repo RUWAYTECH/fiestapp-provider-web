@@ -33,8 +33,14 @@ const ChangePassword = ({ disabled }: { disabled?: boolean }) => {
 	const handleSubmitForm = (data: Yup.InferType<typeof schema>) => {
 		changePassword(data).unwrap().then(() => {
 			dispatchNotifyStackSuccess(localize("profile.passwordChanged"))
-		}).catch(() => {
-			dispatchNotifyStackError(localize("profile.passwordChangeError"))
+		}).catch(res => {
+			if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+				res?.data?.messages.forEach((msg: { message: string }) => {
+					dispatchNotifyStackError(msg?.message)
+				})
+			} else {
+				dispatchNotifyStackError(localize("profile.passwordChangeError"))
+			}
 		})
 	}
 

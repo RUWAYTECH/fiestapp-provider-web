@@ -36,10 +36,16 @@ const Services = () => {
 		createService(data).unwrap().then(() => {
 			setShowFormModal(false)
 			dispatchNotifyStackSuccess("Servicio creado correctamente")
-		}).catch(() => {
-			dispatchNotifyStackError("Error al crear el servicio")
+		}).catch(res => {
+			if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+				res?.data?.messages.forEach((msg: { message: string }) => {
+					dispatchNotifyStackError(msg?.message)
+				})
+			} else {
+				dispatchNotifyStackError("Error al crear el servicio")
+			}
 		})
-  }
+	}
 
 	useEffect(() => {
 		getMyServices(pagination)
@@ -58,8 +64,14 @@ const Services = () => {
 				onClickOk: () => {
 					deleteService(serviceId).unwrap().then(() => {
 						dispatchNotifyStackSuccess("Servicio eliminado correctamente")
-					}).catch(() => {
-						dispatchNotifyStackError("Error al eliminar el servicio")
+					}).catch(res => {
+						if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+							res?.data?.messages.forEach((msg: { message: string }) => {
+								dispatchNotifyStackError(msg?.message)
+							})
+						} else {
+							dispatchNotifyStackError("Error al eliminar el servicio")
+						}
 					})
 					closeInstanceModal()
 				},
@@ -76,8 +88,14 @@ const Services = () => {
 		getService(serviceId).unwrap().then((res) => {
 			setEditData(res.data)
 			setShowFormModal(true)
-		}).catch(() => {
-			dispatchNotifyStackError("Error al obtener el servicio")
+		}).catch(res => {
+			if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+				res?.data?.messages.forEach((msg: { message: string }) => {
+					dispatchNotifyStackError(msg?.message)
+				})
+			} else {
+				dispatchNotifyStackError("Error al obtener el servicio")
+			}
 		})
 	}
 
@@ -86,8 +104,14 @@ const Services = () => {
 			setShowFormModal(false)
 			setEditData(null)
 			dispatchNotifyStackSuccess("Servicio actualizado correctamente")
-		}).catch(() => {
-			dispatchNotifyStackError("Error al actualizar el servicio")
+		}).catch(res => {
+			if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+				res?.data?.messages.forEach((msg: { message: string }) => {
+					dispatchNotifyStackError(msg?.message)
+				})
+			} else {
+				dispatchNotifyStackError("Error al actualizar el servicio")
+			}
 		})
 	}
 
@@ -97,8 +121,14 @@ const Services = () => {
 				onClickOk: () => {
 					changeStateService(data.id).unwrap().then(() => {
 						dispatchNotifyStackSuccess(`Servicio ${data.status ? "guardado como borrador" : "publicado"} correctamente`)
-					}).catch(() => {
-						dispatchNotifyStackError("Error al cambiar el estado del servicio")
+					}).catch(res => {
+						if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+							res?.data?.messages.forEach((msg: { message: string }) => {
+								dispatchNotifyStackError(msg?.message)
+							})
+						} else {
+							dispatchNotifyStackError("Error al cambiar el estado del servicio")
+						}
 					})
 
 					closeInstanceModal()
@@ -115,20 +145,20 @@ const Services = () => {
 	return (
 		<Card sx={{ p: { xs: 2, md: 3 }, mb: 3 }}>
 			<Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
-        <Typography variant="h5" component="h1" fontWeight="bold">
-          Mis Servicios
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setShowFormModal(true)}
+				<Typography variant="h5" component="h1" fontWeight="bold">
+					Mis Servicios
+				</Typography>
+				<Button
+					variant="contained"
+					startIcon={<AddIcon />}
+					onClick={() => setShowFormModal(true)}
 					color="primary"
-        >
-          Agregar Servicio
-        </Button>
-      </Box>
+				>
+					Agregar Servicio
+				</Button>
+			</Box>
 
-      <ServiceList services={res?.data ?? []} isLoading={isLoading} onDelete={handleDeleteService} onEdit={handleEditService} onChangeState={handleChangeState} />
+			<ServiceList services={res?.data ?? []} isLoading={isLoading} onDelete={handleDeleteService} onEdit={handleEditService} onChangeState={handleChangeState} />
 			{!isLoading && (
 				<Pagination count={totalPages(res?.pageOptions.totalRows, pagination.pageSize)} page={pagination.page} onChange={(_e, page) => setPagination({ ...pagination, page })} color="primary" sx={{ mt: 2 }} variant="outlined" shape="rounded" />
 			)}

@@ -37,8 +37,14 @@ const RenderTabs: React.FC <TabsProps> = ({ loading, data}) => {
 			.then(() => {
 				dispatchNotifyStackSuccess("Cotización actualizada correctamente");
 			})
-			.catch(() => {
-				dispatchNotifyStackError("Error al actualizar la cotización");
+			.catch(res => {
+				if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+					res?.data?.messages.forEach((msg: { message: string }) => {
+						dispatchNotifyStackError(msg?.message)
+					})
+				} else {
+					dispatchNotifyStackError("Error al actualizar la cotización");
+				}
 			});
 	}
 

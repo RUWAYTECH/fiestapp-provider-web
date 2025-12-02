@@ -15,14 +15,14 @@ import { ProfilePhotoPicker } from "./components/profile-photo-picker"
 
 const schema = Yup.object().shape({
 	[updateProviderConstants.NAME]: Yup.string().required(localize("common.fieldRequired")),
-	[updateProviderConstants.PICTURE]: Yup.string().url().required(localize("common.fieldRequired")).optional().nullable(),
+	[updateProviderConstants.PICTURE]: Yup.string().url().optional().nullable(),
 	[updateProviderConstants.DESCRIPTION]: Yup.string().required(localize("common.fieldRequired")),
 	[updateProviderConstants.EMAIL]: Yup.string()
 		.email(localize("common.invalidEmail"))
 		.required(localize("common.fieldRequired")),
 	[updateProviderConstants.PHONE]: Yup.string().required(localize("common.fieldRequired")),
 	[updateProviderConstants.ADDRESS]: Yup.string().required(localize("common.fieldRequired")),
-	[updateProviderConstants.WEBSITE]: Yup.string().url(localize("common.invalidUrl")),
+	[updateProviderConstants.WEBSITE]: Yup.string(),
 	[updateProviderConstants.FACEBOOK]: Yup.string().url(localize("common.invalidUrl")),
 	[updateProviderConstants.INSTAGRAM]: Yup.string().url(localize("common.invalidUrl")),
 })
@@ -30,7 +30,7 @@ const schema = Yup.object().shape({
 const UpdateProvider = () => {
 	const resolver = useYupValidationResolver(schema);
 	const userInfo = Auth.getUserInfo()
-	const [ getProfile, { isLoading: isLoadingProfile } ] = useLazyProfileQuery()
+	const [getProfile, { isLoading: isLoadingProfile }] = useLazyProfileQuery()
 	const [syncProvider, { isLoading: isLoadingSync }] = useSyncProviderMutation()
 
 	const { handleSubmit, control, setValue, watch, formState: { errors } } = useForm<Yup.InferType<typeof schema>>({
@@ -67,8 +67,14 @@ const UpdateProvider = () => {
 
 		syncProvider(newData).unwrap().then(() => {
 			dispatchNotifyStackSuccess('Datos actualizados correctamente')
-		}).catch(() => {
-			dispatchNotifyStackError('Error al actualizar datos')
+		}).catch(res => {
+			if (Array.isArray(res?.data?.messages) && res?.data?.messages.length > 0) {
+				res?.data?.messages.forEach((msg: { message: string }) => {
+					dispatchNotifyStackError(msg?.message)
+				})
+			} else {
+				dispatchNotifyStackError('Error al actualizar datos')
+			}
 		})
 	}
 
