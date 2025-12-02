@@ -7,7 +7,7 @@ import { Box, Button, Grid } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 import UploadImage, { ImageFile } from './upload-images'
-import { useGetCategoriesQuery } from '@/stateManagement/apiSlices/categoryApi'
+import { useGetAllCategoryQuery } from '@/stateManagement/apiSlices/categoryApi'
 import { useGetUbigeosQuery } from '@/stateManagement/apiSlices/ubigeoApi'
 import { ServiceRequestDto, ServiceResponseDto } from '@/stateManagement/models/service/service-dto'
 import { useEffect, useState } from 'react'
@@ -51,7 +51,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoa
 		resolver,
 	})
 
-	const { data: categories, isLoading: loadingCategories } = useGetCategoriesQuery(undefined)
+	const { data: categories, isLoading: loadingCategories } = useGetAllCategoryQuery(undefined)
 	const { data: ubigeos, isLoading: loadingUbigeos } = useGetUbigeosQuery(undefined)
 
 	const handleFormSubmit = (data: Yup.InferType<typeof schema>) => {
@@ -187,7 +187,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ data, onCancel, onSave, isLoa
 								label={localize("service.category")}
 								name="category"
 								id="category"
-								options={categories?.map(item => ({ label: item.name, value: item.id })) || []}
+								options={categories?.data?.map(item => ({ label: item.name, value: item.id })) || []}
 								onSelectItem={(_e: any, option: any) => {
 									setValue("category", option.id);
 								}}

@@ -5,6 +5,7 @@
   "common.add": "Agregar",
 	"common.save": "Guardar",
   "common.cancel": "Cancelar",
+	"common.clear": "Limpiar",
   "common.ok": "Ok",
   "common.yes": "Si",
   "common.no": "No",
@@ -156,5 +157,11 @@
 	"service.serviceZone": "Zonas de servicio",
 	"service.images": "Fotos del servicio",
 	"service.category": "Categoría",
+
+	"category.newTitle": "Nueva Categoría",
+	"category.editTitle": "Editar Categoría",
+	"category.name": "Nombre",
+	"category.description": "Descripción",
+
   "":""
 }

@@ -21,7 +21,11 @@ export const endpoints = {
 		changeStatus: '/provider-services/:id/change-status'
 	},
 	category: {
-		getCategories: '/categories',
+		getAll: '/categories',
+		getById: '/categories/:id',
+		create: '/categories',
+		update: '/categories/:id',
+		delete: '/categories/:id'
 	},
 	ubigeo: {
 		getUbigeos: '/ubigeos',

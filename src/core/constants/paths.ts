@@ -19,6 +19,7 @@ const paths = {
     SERVICES:'/secure/services',
 
 		QUOTES:'/secure/quotes',
+		CATEGORIES:'/secure/categories',
 }
 
 export default paths;

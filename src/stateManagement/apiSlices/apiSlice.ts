@@ -9,6 +9,7 @@ const apiSlice = createApi({
 				'Provider',
 				'Service',
 				'RequestService',
+				'Category'
     ],
     endpoints: () => ({
 

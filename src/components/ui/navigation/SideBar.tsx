@@ -26,6 +26,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { Fragment, useEffect, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useMenu from "@/core/hooks/useMenu";
+import { UserRole } from "@/stateManagement/models/user/userDto";
+import { Category } from "@mui/icons-material";
 
 const drawerWidth = sidebarWidth;
 
@@ -78,7 +80,7 @@ const Drawer = styled(MuiDrawer, {
 
 
 
-const pagesList = [
+const genricPagesList = [
   {
     link: paths.DASHBOARD,
     name: "Dashboard",
@@ -106,6 +108,13 @@ const pagesList = [
 	}
 ];
 
+const adminPagesList = [
+	{
+		link: paths.CATEGORIES,
+		name: "Categorías",
+		icon: <Category />,
+	},
+];
 
 interface SideBarProps {
   open: boolean;
@@ -116,6 +125,8 @@ function SideBar({ open, setOpen }: SideBarProps) {
   const location = useLocation();
   const { items, isLoading } = useMenu();
   const currentPath = location.pathname;
+	const userInfo = Auth.getUserInfo();
+	const [pagesList, setPagesList] = useState(genricPagesList);
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -146,6 +157,14 @@ function SideBar({ open, setOpen }: SideBarProps) {
       window.scrollTo(0, 0);
     }
   }, []);
+
+	useEffect(() => {
+		if (userInfo && userInfo.role === UserRole.ADMIN) {
+			const newPagesList = [...genricPagesList];
+			newPagesList.splice(1, 0, ...adminPagesList);
+			setPagesList(newPagesList);
+		}
+	}, [userInfo?.role]);
 
   return (
     <Drawer variant="permanent" open={open}>
