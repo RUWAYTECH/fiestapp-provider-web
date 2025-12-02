@@ -13,7 +13,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { formatDateddMMyyyy } from "@/utils/format/formatDates";
 import { RequestServiceResponseDto } from "@/stateManagement/models/request-service/request-service-dto";
-import { RequestStatus } from "@/core/constants/requestStatus";
+import { RequestStatus, statusLabel } from "@/core/constants/requestStatus";
 
 interface QuoteCardProps {
 	quote: RequestServiceResponseDto;
@@ -86,7 +86,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 						fontWeight: "bold",
 					}}
 				>
-					{quote.status}
+					{statusLabel[quote.status]}
 				</Typography>
 			</Box>
 			<Typography variant="h6" sx={{ fontWeight: "bold" }}>

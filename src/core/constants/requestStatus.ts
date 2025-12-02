@@ -4,3 +4,10 @@ export enum RequestStatus {
 	COMPLETED = 'COMPLETED',
 	CANCELLED = 'CANCELLED'
 }
+
+export const statusLabel: Record<RequestStatus, string> = {
+	[RequestStatus.REQUESTED]: 'Solicitado',
+	[RequestStatus.IN_PROGRESS]: 'En Progreso',
+	[RequestStatus.COMPLETED]: 'Completado',
+	[RequestStatus.CANCELLED]: 'Cancelado'
+};
