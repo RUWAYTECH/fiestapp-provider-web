@@ -9,11 +9,13 @@ import {
 	TextField,
 	Grid,
 	CircularProgress,
+	IconButton,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { formatDateddMMyyyy } from "@/utils/format/formatDates";
 import { RequestServiceResponseDto } from "@/stateManagement/models/request-service/request-service-dto";
 import { RequestStatus, statusLabel } from "@/core/constants/requestStatus";
+import { ExpandLess } from "@mui/icons-material";
 
 interface QuoteCardProps {
 	quote: RequestServiceResponseDto;
@@ -103,13 +105,12 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, updating, isEditable, onSu
 			<Typography>Personas: {quote.guestQty}</Typography>
 			<Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
 				{isOpen ? (
-					<Button
-						variant="outlined"
+					<IconButton
 						color="secondary"
 						onClick={() => setIsOpen(false)}
 					>
-						Cancelar
-					</Button>
+						<ExpandLess />
+					</IconButton>
 				) : (
 					<Button
 						variant="outlined"

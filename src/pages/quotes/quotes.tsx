@@ -16,7 +16,7 @@ import { RequestStatus } from "@/core/constants/requestStatus";
 const Quotes = () => {
 	const [tabIndex, setTabIndex] = useState(0);
 	const [pagination, setPagination] = useState({ page: 1, pageSize: 10 })
-	const [getQuotes, { data: res, isLoading }] = useLazyGetRequestMyServicesQuery();
+	const [getQuotes, { data: res, isFetching:isLoading }] = useLazyGetRequestMyServicesQuery();
 
 	const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
 		setTabIndex(newValue);
