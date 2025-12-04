@@ -36,19 +36,25 @@ export function ServiceList({ services, isLoading, onEdit, onDelete, onChangeSta
 									{service.name}
 								</Typography>
 								<IconButton
+									color="info"
 									size="small"
+									title="Editar servicio"
 									onClick={() => onEdit && onEdit(service.id)}
 								>
 									<EditIcon fontSize="small" />
 								</IconButton>
 								<IconButton
 									size="small"
+									color="error"
+									title="Eliminar servicio"
 									onClick={() => onDelete && onDelete(service.id)}
 								>
 									<DeleteIcon fontSize="small" />
 								</IconButton>
 								<IconButton
 									size="small"
+									title="Cambiar a Borrador/Publicado"
+									color="warning"
 									onClick={() => onChangeState && onChangeState(service)}
 								>
 									<ChangeStateIcon fontSize="small" />

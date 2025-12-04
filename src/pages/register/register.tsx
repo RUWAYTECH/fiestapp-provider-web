@@ -1,5 +1,5 @@
 import logo from "@/assets/logo.png";
-import Apartment from "@/assets/portada.jpg";
+import Apartment from "@/assets/portada.jpeg";
 import CustomInput from "@/components/ui/input/CustomInput";
 import useYupValidationResolver from "@/core/hooks/useYupValidationResolver";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -108,9 +108,10 @@ const Register: React.FC = () => {
 						<br />
 						<Typography
 							variant="h5"
-							sx={{ fontWeight: "bold", textAlign: "center" }}
+							sx={{ fontWeight: "bold", textAlign: "center", maxWidth: "400px" }}
 						>
-							Crea tu cuenta
+							Crea tu cuenta como proveedor y comienza a ofrecer tus servicios
+							
 						</Typography>
 						<Box sx={{ width: "100%", maxWidth: "400px" }}>
 							<form onSubmit={handleSubmit(handleSubmitForm)}>

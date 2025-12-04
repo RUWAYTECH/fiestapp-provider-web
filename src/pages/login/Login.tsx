@@ -1,5 +1,5 @@
 import logo from "@/assets/logo.png";
-import Apartment from "@/assets/portada.jpg";
+import Apartment from "@/assets/portada.jpeg";
 import CustomInput from "@/components/ui/input/CustomInput";
 import useYupValidationResolver from "@/core/hooks/useYupValidationResolver";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -153,7 +153,7 @@ const Login: React.FC = () => {
 							variant="h5"
 							sx={{ fontWeight: "bold", textAlign: "center" }}
 						>
-							Inicia sesión en tu cuenta
+							Inicia sesión en tu cuenta como proveedor
 						</Typography>
 						<Box sx={{ width: "100%", maxWidth: "400px" }}>
 							<Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
