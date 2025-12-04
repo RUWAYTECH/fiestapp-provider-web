@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { CssBaseline } from "@mui/material";
 import createCustomTheme from "./theme";
 import { ThemeProvider } from "@mui/material/styles";
@@ -15,8 +15,7 @@ import { languageWithoutRegionCode, messages } from "./utils/localizer";
 import NotistackProvider from "./components/containers/notiStack/NotistackProvider";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Config from "./core/config/config";
-// import { Suspense } from 'react';
-// import LoadingLazy from '@/pages/LoadingLazy';
+import LoadingLazy from '@/pages/LoadingLazy';
 
 function App() {
   const [mode, setMode] = useState<"light" | "dark">("light");
@@ -50,7 +49,9 @@ function App() {
 									{mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
 								</IconButton>
 							</div>
-							<RouterProvider router={Routing} />
+							<Suspense fallback={<LoadingLazy />}>
+								<RouterProvider router={Routing} />
+							</Suspense>
 						</GoogleOAuthProvider>
 					</NotistackProvider>
         </ThemeProvider>
