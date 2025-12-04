@@ -51,7 +51,7 @@ function NavBar({ open, setOpen }: NavBarProps) {
   };
 
   const userInfo = Auth.getUserInfo();
-  const fullName =userInfo?.data?.fullName;
+  const fullName =userInfo?.name;
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
 
@@ -64,9 +64,9 @@ function NavBar({ open, setOpen }: NavBarProps) {
 
   };
 
-  const handleLogout = () => {  
+  const handleLogout = () => {
    Auth.logout();
-   navigate(paths.LOGIN);  
+   navigate(paths.LOGIN);
   };
 
   return (
@@ -107,7 +107,7 @@ function NavBar({ open, setOpen }: NavBarProps) {
           anchorEl={anchorEl}
           anchorOrigin={{
             vertical: "bottom",
-            horizontal: "right", 
+            horizontal: "right",
           }}
           keepMounted
           transformOrigin={{
