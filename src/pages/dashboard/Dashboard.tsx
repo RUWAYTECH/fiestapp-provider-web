@@ -5,7 +5,7 @@ import Auth from "@/core/services/auth/auth";
 
 function Dashboard() {
   const userData = Auth.getUserData();
-  let username = userData?.username;
+  let username = userData?.name;
 
   return (
     <>

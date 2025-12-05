@@ -13,9 +13,9 @@ const createCustomTheme = (mode: 'light' | 'dark') => {
         palette: {
             mode,
             primary: {
-                light: '#538CFF',
-                main: '#2970FF',
-                dark: '#1C4EB2',
+                light: '#e7000b',
+                main: '#e7000b',
+                dark: '#e7000b',
                 contrastText: '#fff',
             },
             secondary: {
@@ -24,7 +24,7 @@ const createCustomTheme = (mode: 'light' | 'dark') => {
                 dark: '#131925',
                 contrastText: '#fff',
             },
-            
+
             common: {
                 black: '#000',
                 white: '#fff',
@@ -52,7 +52,7 @@ const createCustomTheme = (mode: 'light' | 'dark') => {
                 }
               }
         }
-        
+
     });
 }
 

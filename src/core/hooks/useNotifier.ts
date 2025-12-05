@@ -40,7 +40,7 @@ const useNotifier = () => {
             options?.onClose(event, reason, myKey)
           }
         },
-        onExited: (event, myKey) => {
+        onExited: (_event, myKey) => {
           // remove this snackbar from redux store
           dispatch(removeSnackBar({key: myKey} as any))
           removeDisplayed(myKey)

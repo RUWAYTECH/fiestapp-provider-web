@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { CssBaseline } from "@mui/material";
 import createCustomTheme from "./theme";
 import { ThemeProvider } from "@mui/material/styles";
@@ -13,8 +13,9 @@ import store from "./stateManagement/store";
 import { IntlProvider } from "react-intl";
 import { languageWithoutRegionCode, messages } from "./utils/localizer";
 import NotistackProvider from "./components/containers/notiStack/NotistackProvider";
-// import { Suspense } from 'react';
-// import LoadingLazy from '@/pages/LoadingLazy';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import Config from "./core/config/config";
+import LoadingLazy from '@/pages/LoadingLazy';
 
 function App() {
   const [mode, setMode] = useState<"light" | "dark">("light");
@@ -30,25 +31,29 @@ function App() {
         messages={messages}
       >
         <ThemeProvider theme={theme}>
-          <NotistackProvider>         
-            <CssBaseline />
-            <div
-              style={{
-                position: "fixed",
-                top: 0,
-                right: 0,
-                zIndex: 1299,
-                backgroundColor: theme.palette.background.default,
-                borderRadius: "0 0 0 10px",
-                padding: "3px",
-              }}
-            >
-              <IconButton onClick={toggleColorMode} color="inherit">
-                {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-              </IconButton>
-            </div>           
-            <RouterProvider router={Routing} />
-          </NotistackProvider>
+          <NotistackProvider>
+						<GoogleOAuthProvider clientId={Config.googleClientId}>
+							<CssBaseline />
+							<div
+								style={{
+									position: "fixed",
+									top: 0,
+									right: 0,
+									zIndex: 1299,
+									backgroundColor: theme.palette.background.default,
+									borderRadius: "0 0 0 10px",
+									padding: "3px",
+								}}
+							>
+								<IconButton onClick={toggleColorMode} color="inherit">
+									{mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+								</IconButton>
+							</div>
+							<Suspense fallback={<LoadingLazy />}>
+								<RouterProvider router={Routing} />
+							</Suspense>
+						</GoogleOAuthProvider>
+					</NotistackProvider>
         </ThemeProvider>
       </IntlProvider>
     </Provider>

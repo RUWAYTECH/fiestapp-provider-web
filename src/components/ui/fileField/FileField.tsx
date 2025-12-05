@@ -16,7 +16,7 @@ interface FileFieldProps {
     loading?: boolean;
 }
 
-function FileField(props: FileFieldProps, ref: any) {
+function FileField(props: FileFieldProps, _ref: any) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [file, setFile] = React.useState<File | null>(null);
 

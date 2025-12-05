@@ -11,8 +11,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Zoom from "@mui/material/Zoom";
 import Box from "@mui/material/Box";
-import MiIcono from "@/assets/logoProject.png";
+import MiIcono from "@/assets/logo.png";
 import HomeIcon from "@mui/icons-material/Home";
+import UpdateProviderIcon from "@mui/icons-material/ManageAccounts";
+import QuotesIcon from "@mui/icons-material/AttachMoney";
+import ServiceIcon from "@mui/icons-material/Build";
+import ProfileIcon from "@mui/icons-material/AccountCircle";
 import { paths } from "@/core/constants";
 import { Link, useLocation } from "react-router-dom";
 import Auth from "@/core/services/auth/auth";
@@ -22,6 +26,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { Fragment, useEffect, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useMenu from "@/core/hooks/useMenu";
+import { UserRole } from "@/stateManagement/models/user/userDto";
+import { Category } from "@mui/icons-material";
 
 const drawerWidth = sidebarWidth;
 
@@ -74,14 +80,41 @@ const Drawer = styled(MuiDrawer, {
 
 
 
-const pagesList = [
+const genricPagesList = [
   {
     link: paths.DASHBOARD,
     name: "Dashboard",
     icon: <HomeIcon />,
   },
+	{
+		link: paths.UPDATE_PROVIDER,
+		name: "Actualizar datos",
+		icon: <UpdateProviderIcon />,
+	},
+	{
+		link: paths.SERVICES,
+		name: "Mis Servicios",
+		icon: <ServiceIcon />,
+	},
+	{
+		link: paths.QUOTES,
+		name: "Cotizaciones",
+		icon: <QuotesIcon />,
+	},
+	{
+		link: paths.PROFILE,
+		name: "Perfil",
+		icon: <ProfileIcon />,
+	}
 ];
 
+const adminPagesList = [
+	{
+		link: paths.CATEGORIES,
+		name: "Categorías",
+		icon: <Category />,
+	},
+];
 
 interface SideBarProps {
   open: boolean;
@@ -92,6 +125,8 @@ function SideBar({ open, setOpen }: SideBarProps) {
   const location = useLocation();
   const { items, isLoading } = useMenu();
   const currentPath = location.pathname;
+	const userInfo = Auth.getUserInfo();
+	const [pagesList, setPagesList] = useState(genricPagesList);
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -123,6 +158,14 @@ function SideBar({ open, setOpen }: SideBarProps) {
     }
   }, []);
 
+	useEffect(() => {
+		if (userInfo && userInfo.role === UserRole.ADMIN) {
+			const newPagesList = [...genricPagesList];
+			newPagesList.splice(1, 0, ...adminPagesList);
+			setPagesList(newPagesList);
+		}
+	}, [userInfo?.role]);
+
   return (
     <Drawer variant="permanent" open={open}>
       <DrawerHeader>
@@ -132,14 +175,16 @@ function SideBar({ open, setOpen }: SideBarProps) {
             justifyContent: "center",
             alignItems: "center",
             width: "100%",
+						fontWeight: 'bold',
+						fontSize: '20px'
           }}
         >
           <img
             src={MiIcono}
-            style={{ width: "40px", height: "auto", marginRight: "20px" }}
+            style={{ width: "25px", height: "auto", marginRight: "20px" }}
             alt="Icono"
           />
-          Template
+          Fiest<span style={{ color: '#e7000b' }}>App</span>
         </Box>
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === "rtl" ? (
@@ -223,7 +268,7 @@ function SideBar({ open, setOpen }: SideBarProps) {
             <CircularProgress/>
           ) : (
             <List>
-              {items.map((page, index) => (
+              {items.map((page: any, index: number) => (
                 <Fragment key={page.name}>
                   <ListItem disablePadding sx={{ display: "block" }}>
                     {page.children ? (

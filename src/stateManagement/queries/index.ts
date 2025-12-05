@@ -1,6 +1,5 @@
-import { loginMutation, allSelectUserQuery} from './userQueries'
+import { loginMutation} from './userQueries'
 
 export {
     loginMutation,
-    allSelectUserQuery,
 }

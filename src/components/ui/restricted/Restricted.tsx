@@ -1,42 +1,40 @@
 import React, { ReactNode } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import useMenu from '../../../core/hooks/useMenu'
-import { searchActionStatus } from '@/utils/permissionRules';
+import Auth from '@/core/services/auth/auth';
+import { UserRole } from '@/stateManagement/models/user/userDto';
 
 interface RestrictedProps {
-    children: ReactNode;
-    allowedTo: string;
-    fallback?: ReactNode;
-    showLoading?: boolean;
-    [key: string]: any; // To capture any other props
-  }
+	children: ReactNode;
+	allowedTo: UserRole;
+	fallback?: ReactNode;
+	showLoading?: boolean;
+	[key: string]: any; // To capture any other props
+}
 
-  
+
 const Restricted: React.FC<RestrictedProps> = ({
-    allowedTo,
-    children,
-    fallback = <></>,
-    showLoading = false,
-  }) => {
+	allowedTo,
+	children,
+	fallback = <></>,
+	showLoading = false,
+}) => {
+	const userInfo = Auth.getUserInfo();
 
-  const {data, isLoading} = useMenu()
-console.log("restrict:",data,allowedTo);
+	const isAllowed = userInfo.role === allowedTo;
 
-  const isAllowed = searchActionStatus(data, allowedTo);
-  
-  if (isLoading && showLoading) {
-    return (
-      <div data-testid="restricted-spinner">
-        <CircularProgress />
-      </div>
-    )
-  }
+	if (showLoading) {
+		return (
+			<div data-testid="restricted-spinner">
+				<CircularProgress />
+			</div>
+		)
+	}
 
-  if (isAllowed) {
-    return <>{children}</>
-  }
+	if (isAllowed) {
+		return <>{children}</>
+	}
 
-  return <>{fallback}</>
+	return <>{fallback}</>
 }
 
 export default Restricted

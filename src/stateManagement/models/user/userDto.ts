@@ -1,18 +1,13 @@
-export interface userDto {
-    identifier: string;
-    password: string;
+
+export enum UserRole {
+	ADMIN = 'ADMIN',
+	USER = 'USER'
 }
 
-export interface IUserDto {
-    rolType: string;
-}
-
-export interface emailUserDto {
-    email: string;
-}
-
-export interface resetPasswordDto {
-    password: string;
-    passwordConfirmation: string;
-    code: string;
+export interface User {
+	id: string;
+	name: string;
+	email: string;
+	picture: string;
+	role: UserRole;
 }

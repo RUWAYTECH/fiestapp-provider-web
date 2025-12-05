@@ -36,7 +36,7 @@ const ResetPassword: React.FC = () => {
         setCodeError('');
         resetPassword(data)
             .unwrap()
-            .then((res: any) => {
+            .then(() => {
                 dispatchNotifyStackSuccess(localize('login.success'))
                 navigate(paths.LOGIN)
             })
